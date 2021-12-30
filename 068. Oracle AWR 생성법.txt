@@ -1,0 +1,7 @@
+sqlplus / as sysdba
+exec dbms_workload_repository.create_snapshot;
+@?/rdbms/admin/awrrpt.sql
+html
+start snapshot id
+end snapshot id
+snapshot name

@@ -1,0 +1,7 @@
+1) To view database
+
+select * from v$database;
+
+2) To view instance
+
+select * from v$instance;

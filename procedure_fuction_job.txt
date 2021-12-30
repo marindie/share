@@ -1,0 +1,46 @@
+
+==========================   OBJECT 들의 DDL 문 GENERATE 방법 PROCEDURE ====================================================
+select distinct NAME from USER_SOURCE where TYPE='PROCEDURE';
+
+SET NEWPAGE 0
+SET TERMOUT OFF
+SET VERIFY OFF
+SET SPACE 0
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SET HEADING OFF
+SET TRIMSPOOL ON
+SET LINESIZE 500
+SPOOL MAKE_PROCEDURE_SCRIPT.txt
+SELECT TEXT FROM USER_SOURCE WHERE TYPE='PROCEDURE' ORDER BY NAME, LINE;
+SPOOL OFF
+
+
+==========================   OBJECT 들의 DDL 문 GENERATE 방법 FUNCTION ====================================================
+select distinct NAME from USER_SOURCE where TYPE='FUNCTION';
+
+SET NEWPAGE 0
+SET TERMOUT OFF
+SET VERIFY OFF
+SET SPACE 0
+SET PAGESIZE 0
+SET FEEDBACK OFF
+SET HEADING OFF
+SET TRIMSPOOL ON
+SET LINESIZE 500
+SPOOL MAKE_FUNCTION_SCRIPT.txt
+SELECT TEXT FROM USER_SOURCE WHERE TYPE='FUNCTION' ORDER BY NAME, LINE;
+SPOOL OFF
+
+==========================   JOB scheduler  생성  ====================================================
+select * from user_jobs;
+
+DECLARE
+   X number;
+BEGIN
+	DBMS_JOB.SUBMIT( X ,'ADD_PARTITIONS();' ,sysdate ,'trunc(sysdate) + 1 + 2/24');  -- 매일 새벽 2시에 수행..
+	DBMS_OUTPUT.PUT_LINE('Job Number is :' || to_char(X));
+END;
+/
+
+exec DBMS_JOB.RUN(X);  -- job number...

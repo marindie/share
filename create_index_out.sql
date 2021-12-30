@@ -1,0 +1,26 @@
+SET ECHO OFF
+SET LINESIZE 3000
+SET TRIMOUT ON
+SET TRIMSPOOL ON
+SET HEADING OFF
+SET FEEDBACK OFF
+SET PAGESIZE 0
+SET TERM OFF
+
+set long 2000000000
+exec DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM, 'SQLTERMINATOR', true);
+EXECUTE DBMS_METADATA.SET_TRANSFORM_PARAM(DBMS_METADATA.SESSION_TRANSFORM,'STORAGE',false);
+
+SPOOL create_index_out
+
+--SELECT DBMS_METADATA.GET_DDL('TABLE',tname) || ';' from tab;
+SELECT DBMS_METADATA.GET_DDL('INDEX',index_name) from user_indexes where index_name not like 'SYS%' and  index_name not like 'PK%';
+--SELECT DBMS_METADATA.GET_DDL('PROCEDURE',name) from (select distinct name from user_source where type='PROCEDURE');
+--SELECT 'CREATE OR REPLACE ' from dual 
+--UNION ALL
+SELECT text FROM user_source WHERE NAME in (SELECT NAME from (select distinct name from user_source where type='PROCEDURE'));
+
+SPOOL OFF
+
+exit;
+
