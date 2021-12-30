@@ -1,0 +1,55 @@
+1. KVM 에서 GUI로 VM 추가
+
+2. Local iso 로 설치 하기 선택.
+사전에 iso 이미지는 다운 받아 놓자.
+192.168.1.200번 장비 marindie/wony12 계정으로 들어가서 iso 폴더에 보면 centos7 있음
+
+3. 이름, Memory, CPU, Disk 용량, 언어 선택
+
+4. Network 설정 버튼 클릭해서 설치된 네트워크 카드 활성화 시키고 Static 으로 세팅
+IPADDR=192.168.1.206
+GATEWAY=192.168.0.1
+NETMASK=255.255.0.0
+DNS1=8.8.8.8 (google)
+DNS1=8.8.8.4
+DNS3=168.126.63.1
+
+5. 설치 완료 후 root 랑 사용자 계정 생성 하고 재시작 하면 일단 OS 설치는 완료.
+로그인 후 hostname -I 로 IP 가 192.168.1.206 인지 확인
+ip addr show 로 상세 정보도 보고 싶으면 확인. 
+ping www.google.com 으로 ping 나가는지 테스트
+
+6. ssh 설치
+yum -y install openssh-server openssh-clients openssh-akspass
+systemctl status sshd 로 서비스 여부 확인 (안떠있으면, service sshd start)
+ss -nalt 로 22번 포트 리스닝 상태인지 확인
+7. 방화벽 22 번 TCP 등록
+firewall-cmd --list-all 로 리스트 확인
+firewall-cmd --permanent --zone=public --add-port=22/tcp
+firewall-cmd --reload 로 재시작
+firewall-cmd --list-all 로 리스트 확인
+ssh 툴로 원격 접속 시도
+
+8. 한글 처리
+ssh 로 접속시 한글이 깨져 보일수 있는데, 먼저 ssh 설정에서 font 가 한글이고
+인코딩이 utf-8인지 확인하자.
+cat /etc/locale.conf 으로 아래 처럼 되어 있으면 정상.
+LANG="ko_KR.UTF-8"
+
+9. ifconfig 설치
+yum -y install net-tools
+
+10. iptables 사용하기
+firewalld 가 보기 불편해서 중지함
+systemctl stop firewalld
+systemctl mask firewalld
+systemctl disable firewalld
+
+yum -y install iptables-services
+systemctl enable iptables
+systemctl start iptables
+iptables --flush
+iptables-save > /etc/sysconfig/iptables
+
+
+

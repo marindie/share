@@ -1,0 +1,40 @@
+==========================
+ADJPetMessageFrameworkProject - k.yoon
+==========================
+pscp -pw WLadmin123 E:\wony\workspace\ADJPetMessageFrameworkProject\WEB\script\adj\pet\sentence_script\sentences_jp.js WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/DefaultWebApp/script/adj/pet/sentence_script
+pscp -pw WLadmin123 E:\wony\workspace\ADJPetMessageFrameworkProject\WEB\script\adj\pet\word_script\words_jp.js  WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/DefaultWebApp/script/adj/pet/word_script
+
+
+==========================
+ADJCommonFrameWeb - k.yoon
+==========================
+--- message_pet_Ljp.properties ---
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\message\message_pet_Ljp.properties WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/config.files/MServer-01/message
+--- sentence_pet_Ljp.properties ---
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\sentence\sentence_pet_Ljp.properties WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/config.files/MServer-01/sentence
+
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\nb\common_nb_service.xml WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/nb
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\cm\common_cm_service.xml WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/cm
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\servicepool\cm_servicemodule.xml WLadmin@10.7.226.210:/workspace/domains/k.yoon/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/servicepool
+
+
+==========================
+ADJPetMessageFrameworkProject - Jayesh
+==========================
+pscp -pw WLadmin123 E:\wony\workspace\ADJPetMessageFrameworkProject\WEB\script\adj\pet\sentence_script\sentences_jp.js WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/DefaultWebApp/script/adj/pet/sentence_script
+pscp -pw WLadmin123 E:\wony\workspace\ADJPetMessageFrameworkProject\WEB\script\adj\pet\word_script\words_jp.js  WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/DefaultWebApp/script/adj/pet/word_script
+
+==========================
+ADJCommonFrameWeb - Jayesh
+==========================
+--- message_pet_Ljp.properties ---
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\message\message_pet_Ljp.properties WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/config.files/MServer-01/message
+--- sentence_pet_Ljp.properties ---
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\sentence\sentence_pet_Ljp.properties WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/config.files/MServer-01/sentence
+
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\nb\common_nb_service.xml WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/nb
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\cm\common_cm_service.xml WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/cm
+pscp -pw WLadmin123 E:\wony\workspace\ADJCommonFrameWeb\ENV_CONFIG\se\axa\adj\pet\nbcm\servicepool\cm_servicemodule.xml WLadmin@10.7.226.210:/workspace/domains/Jayesh/axaApp/config.files/MServer-01/se/axa/adj/pet/nbcm/servicepool
+
+
+pscp -pw WLadmin123 -r E:\wony\workspace\delivery\Pet_Revision\pet\development\database\AXADJ\dml\diff\ WLadmin@10.7.226.210:/home/WLadmin/wony/diff

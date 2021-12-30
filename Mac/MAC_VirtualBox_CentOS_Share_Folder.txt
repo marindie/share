@@ -1,0 +1,18 @@
+========================
+CentOS share folder setting
+========================
+On Windows, you simply click "Devices -> Insert Guest Additions CD images" 
+
+On Linux you need to do the following
+
+가상이미지 설정 - 저장소 - 라이브 cd/dvd - 디스크 아이콘 클릭해서 VBoxGuestAdditions.iso 파일 위치 세팅
+
+/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
+
+yum install gcc* kernel* dkms* make* bzip2 perl*
+mkdir /media/VirtualBoxGuestAdditions
+mount -r /dev/cdrom /media/VirtualBoxGuestAdditions 
+cd /media/VirtualBoxGuestAdditions/
+./VBoxLinuxAdditions.run 
+reboot
+mount -t vboxsf share /root/vbox_share

@@ -1,0 +1,36 @@
+#################################
+# install jekyll 
+#################################
+gem install jekyll install
+
+
+#################################
+# make new jekyll
+#################################
+jekyll new my-blog
+
+##################################
+# run local jekyll
+#################################
+cd my-blog
+bundler exec jekyll serve
+
+#################################
+# install bundler
+#################################
+gem install bundler
+
+#################################
+# install bundle using Gemfile
+#################################
+vi Gemfile
+source "https://rubygems.org"
+gem "github-pages", group: :jekyll_plugins
+save file
+
+bundle install
+
+#################################
+#
+#################################
+

@@ -1,0 +1,19 @@
+============================================
+Struts & Spring Integration
+============================================
+Refer to http://www.codejava.net/frameworks/spring/spring-4-and-struts-2-integration-tutorial-part-1-xml-configuration
+
+Step 1. Download Eclipse JavaEE Packages 
+Step 2. Download WAS (Weblogic or Tomcat)
+Step 3. Install WAS
+Step 4. Create Maven Project and Check Dynamic Web Module in Project Facets
+Step 5. Create pom.xml file and add Dependencies
+Step 6. Set Packaging as war and add plugin attributes in pom.xml
+Step 5. Struts & Spring Configuration including web.xml and setting.xml if necessary
+Step 7. Coding and Maven install
+Step 8. Deploy war file on was server
+
+If [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile (default-testCompile) on project helloworld: Compilation failure
+appears, then open Eclipse.ini and add JDK info as below
+-vm
+C:\Program Files\Java\jdk1.7.0_07\bin\javaw.exe

@@ -1,0 +1,161 @@
+TARGET="/root/wony/target"
+LIST=("classes")
+BACKUP="/root/wony/backup"
+PACKAGE="/root/wony/package"
+
+set_variable(){
+        if [ "${PACKAGE_NAME}" == "a" ]; then
+                TARGET=""
+                LIST=("")
+                BACKUP=""
+                exit;
+        elif [ "${PACKAGE_NAME}" == "b" ]; then
+                TARGET=""
+        LIST=("")
+        BACKUP=""
+                exit;
+        elif [ "${PACKAGE_NAME}" == "c" ]; then
+        TARGET=""
+        LIST=("")
+        BACKUP=""
+                exit;
+        fi
+}
+
+usage(){
+        "=============================================="
+        "  USAGE : One Parameter Only For Package Name "
+        "=============================================="
+}
+
+init(){
+    if [ $# -ge 1 ]; then
+        PACKAGE_NAME=$1 
+        set_variable
+        begin
+    else
+        #usage
+                echo "default"
+                begin
+    fi
+}
+
+begin(){    
+echo "======================================"
+echo " 1. Check List of Backup Folder List  "
+echo " 2. Diff AS-IS and TO-BE Files        "
+echo " 3. Back Up AS-IS Files               "
+echo " 4. Roll Back Files                   "
+echo "       Type 'exit' to finish          "
+echo "======================================"
+
+read -r MENU;                                                                                                                                                               
+if [ -z "${MENU}" ]; then
+    echo "Do you want to Finish?"
+    read -r CONFIRM;
+    if [ -z "${CONFIRM}" ] || [ "${CONFIRM^^}" == "EXIT" ]; then
+        exit;
+    fi
+else
+    if [ "${MENU}" == "1" ]; then
+        check_list
+    elif [ "${MENU}" == "2" ]; then
+                diff_tg_pack
+    elif [ "${MENU}" == "3" ]; then
+        backup_asis
+    elif [ "${MENU}" == "4" ]; then
+        roll_back
+        else
+                exit;
+    fi
+
+        echo "Continue? (Y/N)"
+        read -r CHECKCON;
+        if [ "${CHECKCON}" == "y" ]; then
+        begin
+        else
+                exit
+        fi
+fi
+}
+
+check_list(){
+        echo "===================================="
+        echo "   LIST OF FOLDERS TO BACK UP       "
+        echo 
+        for file in ${LIST[@]}
+        do
+                echo ${TARGET}/${file}
+        done
+        echo "===================================="
+        echo
+}
+
+diff_tg_pack(){
+        echo "===================================="
+        echo "   TARGET FOLDER LIST               "
+        for tg in ${TARGET}/*
+        do
+                for li in ${LIST[@]}
+                do
+                        if [ "${tg}" == "${TARGET}/${li}" ]; then
+                                echo ${tg}
+                        fi
+                done
+        done
+
+        echo
+        echo "   PACKAGE FOLDER LIST              "
+        for tg in ${PACKAGE}/*
+        do
+                for li in ${LIST[@]}
+                do
+                        if [ "${tg}" == "${PACKAGE}/${li}" ]; then
+                                echo ${tg}
+                        fi
+                done
+        done
+
+        echo "===================================="
+        echo
+
+        for li in ${LIST[@]}
+        do
+                diff -qr ${TARGET}/${li} ${PACKAGE}/${li}
+        done
+}
+
+backup_asis(){
+        echo "======================================="
+        echo "   Target Folder For Copy = ${TARGET}  "
+        echo "======================================="
+
+        #echo ${#LIST[@]}
+
+        for tg in ${TARGET}/*
+        do
+                echo ${tg}
+                for li in ${LIST[@]}
+                do
+                        if [ "${tg}" == "${TARGET}/${li}" ]; then
+                                echo "FOUND ${li}"
+                                cp -pr ${TARGET}/${li} ${BACKUP}
+                        fi
+                done
+        done
+
+        ls -al -d -1 ${BACKUP}/**
+}
+
+roll_back(){
+        echo "======================================="
+        echo " List of Folders to Copy From          "
+
+        for folder in ${BACKUP}/*
+        do
+                echo "COPY TO ${folder}"
+                cp -pr ${folder} ${TARGET}
+        done
+}
+
+init

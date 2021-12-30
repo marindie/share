@@ -1,0 +1,36 @@
+===========================
+apache2.2.25 설치 순서
+===========================
+- apache download 주소 
+http://archive.apache.org/dist/httpd/
+
+- 설치 패키지들
+yum -y install gcc* cpp* compat-gcc* flex*
+yum -y install libjpeg* libpng* freetype* gd-* ncurses* libtermcap* libxml* curl-devel
+
+- 압축 해제 명령어
+tar -zxvf httpd-2.2.25.tar.gz
+
+- configure & install
+./configure --prefix=/web/apache2.2.25 \
+--enable-rule=SHARED_CORE \
+--enable-modules=all \
+--enable-mods-shared=most \
+--with-mpm=worker \
+--enable-rewrite \
+--enable-deflate \
+--enable-headers \
+--enable-so \
+--enable-ssl \
+--enable-unique-id
+
+make 시 에러나면 make distclean 실행 (기존 configure 날려주는듯)
+
+./apachectl start 하면 아래 에러 나오는데
+httpd.conf 파일에서 ServerName 주석 해제하고 localhost 로 변경하면 없어짐
+httpd: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
+
+
+===========================
+apache2.2.25 SSL 연동
+===========================

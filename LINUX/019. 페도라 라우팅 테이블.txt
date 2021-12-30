@@ -1,0 +1,10 @@
+=======================
+라우팅 테이블 추가
+=======================
+route add -net 192.168.221.0 netmask 255.255.255.0 gw 172.19.132.1 bond0
+
+route add -net 192.168.221.0 netmask 255.255.255.0 gw 172.19.132.1 bond0
+
+route add -host 172.21.100.143 gw 172.19.132.1 dev bond1
+
+netstat -r | sort

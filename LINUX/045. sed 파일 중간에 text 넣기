@@ -1,0 +1,8 @@
+sed -ie "/pattern/atext"
+sed -ie '/^search/a nameserver 127.0.0.1' filename
+
+If you want to apply the changes in input.txt file. Then, use -i with sed.
+sed -i '/cdef/r add.txt' input.txt
+
+If you want to use a regex as an expression you have to use the -E tag with sed.
+sed -E '/RegexPattern/r add.txt' input.txt

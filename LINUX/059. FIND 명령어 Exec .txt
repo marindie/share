@@ -1,0 +1,14 @@
+
+find . -exec grep chrome {} +
+- 전체 결과에서 한번에 grep
+
+find . -exec grep chrome {} \;
+- 각 결과 마다 grep
+
+find . -name '파일명검색어' -exec sh -c "명령어1; 명령어2; 명령어3;" \;
+
+find . -name '*.txt' -exec sh -c "tar cjvf {}.bz2 {}; rm -f {};" \;
+
+find /was/upwas/WebApp -type f -exec grep "GAEBAL_PORTAL" {} +
+
+

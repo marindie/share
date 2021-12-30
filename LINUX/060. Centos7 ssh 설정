@@ -1,0 +1,34 @@
+ssh 설정
+
+설치 여부 확인
+rpm -qa openssh-server
+
+sshd 상태 확인
+systemctl status sshd
+
+포트번호 변경
+/etc/ssh/sshd_config
+
+sshd 재시작
+sudo service sshd restart
+
+포트가 리스팅 상태인지 확인
+ss -nalt
+
+ssh 포트 확인
+sudo semanage port -l | grep ssh
+
+ssh_port_t 에 TCP 포트 추가
+sudo semanage port -a ssh_port_t -p tcp xxxx
+
+현재 방화벽 확인
+firewall-cmd --list-all
+
+새로운 포트 추가
+sudo firewall-cmd --permanant --zone=public --add-port=xxxx/tcp
+
+방화벽 재시작
+sudo firewall-cmd --reload
+
+
+

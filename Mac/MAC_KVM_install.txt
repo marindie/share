@@ -1,0 +1,33 @@
+====================
+Mac OS KVM Install
+====================
+# Make sure you installed homebrew
+brew search
+
+brew tap
+brew tap jeffreywildman/homebrew-virt-manager
+brew install virt-manager virt-viewer
+brew install libvirt qemu
+brew install libvirt-python
+pip install libvirt-python
+
+brew cast install xquartz
+brew reinstall pygobject pygobject3
+
+virt-manager --no-fork
+
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# icon download
+https://www.dropbox.com/s/2qwcqtnl66alulc/virt-manager.zip?dl=0
+
+# After qemu installation.. I got
+If you need to have ncurses first in your PATH run:
+  echo 'export PATH="/usr/local/opt/ncurses/bin:$PATH"' >> ~/.zshrc
+
+For compilers to find ncurses you may need to set:
+  export LDFLAGS="-L/usr/local/opt/ncurses/lib"
+  export CPPFLAGS="-I/usr/local/opt/ncurses/include"
+
+For pkg-config to find ncurses you may need to set:
+  export PKG_CONFIG_PATH="/usr/local/opt/ncurses/lib/pkgconfig"

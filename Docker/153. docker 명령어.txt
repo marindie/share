@@ -1,0 +1,167 @@
+==============================
+현재 실행 중인 컨테이너 아이디 확인
+==============================
+docker ps -q
+
+==============================
+실행중인 컨테이너가 있으면 아래 명령으로 종료.
+==============================
+docker kill $(docker ps -q)
+docker container stop container-id
+
+==============================
+모든 종료된 컨테이너를 삭제한다 (including data-only containers)
+==============================
+docker rm $(docker ps -a -q)
+
+==============================
+모든 이미지 보기
+==============================
+docker images 
+docker image ls
+
+==============================
+'untagged/dangling' (<none>) images 보기
+==============================
+docker images -f dangling=true
+docker images 도 docker ps 와 마찬가지로 -q 옵션을 주면 이미지 아이디만 출력된다.
+docker images -q -f dangling=true
+
+==============================
+모든 'untagged/dangling' (<none>) 이미지 삭제
+==============================
+docker rmi $(docker images -q -f dangling=true)
+
+==============================
+모든 이미지 삭제
+==============================
+docker rmi $(docker images -q)
+
+==============================
+특정 테그 삭제
+==============================
+docker rmi hello-world:v1
+
+==============================
+빌드 명령어 -t 는 태크 옵션
+==============================
+docker build -t friendlyhello .
+
+==============================
+APP 실행 명령어
+==============================
+docker run -p 4000:80 friendlyhello (4000이 실제 포트)
+docker run -i -t -p 8000:80 --name centos_server centos
+
+==============================
+PUBLIC IMAGE
+==============================
+docker push username/repository:tag
+
+==============================
+Pull and run the image from the remote repository
+==============================
+docker run -p 4000:80 username/repository:tag
+
+==============================
+Docker Toolbox 사용시 Docker Machine IP 사용해야함. 확인방법
+==============================
+docker-machine ip
+
+==============================
+Deploy 전에 swarm init 해야함
+==============================
+docker swarm init --advertise-init IP
+
+==============================
+deploy 명령
+==============================
+docker stack deploy -c docker-compose.yml getstartedlab (yml 수정하고 다시 명령어 날리면 UPDATE 함)
+-- 참고
+Note: If your image is stored on a private registry instead of Docker Hub, 
+you need to be logged in using docker login <your-registry> and then you need to add the --with-registry-auth flag to the above command. 
+For example:docker login registry.example.com
+docker stack deploy --with-registry-auth -c docker-compose.yml getstartedlab
+
+==============================
+service 조회
+==============================
+docker service ls
+docker service ps getstartedlab_web
+docker container ls -q
+
+docker-compose.yml 파일의 replica 항목의 수를 늘려서 scale 확장 가능함
+
+==============================
+Take down the app and the swarm
+==============================
+docker stack rm getstartedlab
+docker swarm leave --force
+
+==============================
+VMS ON YOUR LOCAL MACHINE (MAC, LINUX, WINDOWS 7 AND 8)
+==============================
+docker-machine create --driver virtualbox myvm1
+docker-machine create --driver virtualbox myvm2
+
+==============================
+LIST THE VMS AND GET THEIR IP ADDRESSES
+==============================
+docker-machine ls
+
+==============================
+INITIALIZE THE SWARM AND ADD NODES
+==============================
+docker-machine ssh myvm1 "docker swarm init --advertise-addr <myvm1 ip>"
+
+To add a worker to this swarm, run the following command:
+
+  docker swarm join \
+  --token <token> \
+  <myvm ip>:<port>
+
+==============================
+DOCKER MACHINE SHELL ENVIRONMENT ON WINDOWS
+==============================
+docker-machine env myvm1
+run the result command
+& "C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe" env myvm1 | Invoke-Expression
+eval $(docker-machine env myvm1)
+docker-machine ls 로 myvm1 이 swam manager 로 세팅 되어 있는지 확인
+
+==============================
+Cleanup and reboot
+==============================
+docker stack rm getstartedlab
+eval $(docker-machine env -u)
+& "C:\Program Files\Docker\Docker\Resources\bin\docker-machine.exe" env -u | Invoke-Expression
+
+==============================
+Restarting Docker machines
+==============================
+docker-machine ls
+docker-machine start <machine-name>
+
+
+==============================
+Docker stack 정보 보기
+==============================
+docker stack ps getstartedlab
+
+==============================
+Docker File 전송 명령어
+==============================
+docker cp src/. mycontainer:/target
+docker cp mycontainer:/src/. target
+Note that docker cp is not new in Docker 1.8. 
+In older versions of Docker, the docker cp command only allowed copying files from a container to the host.
+
+
+==============================
+Docker Volume Setting (공유 폴더 생성)
+==============================
+docker run -p 8000:80 -v /path/dir:/home/nsuser/share
+사용법은 host:container 경로로 마추는데, 파일의 내용을 host에서 변경하면 container 가 해당 내용을 읽을 수 있게 되어서
+image 를 다시 빌드 하지 않고 실시간으로 반영이 가능함
+
+

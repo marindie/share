@@ -1,0 +1,1 @@
+ps -ef | grep java | awk '{print $2}' | xargs ps hH p | awk '{cur = $1; cnt = 1; while( cur == $1 ) { cnt = cnt + 1; if(getline==0) {break;}} print "Number of Thread for " cur " PID is " cnt;}'

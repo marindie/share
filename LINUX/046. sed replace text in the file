@@ -1,0 +1,1 @@
+sed -ie "s/$x/$y/g" /tmp/file.txt

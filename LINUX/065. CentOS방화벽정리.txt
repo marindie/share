@@ -1,0 +1,160 @@
+[CentOS 5, 6] iptables 사용방법
+
+====================
+방화벽 정보 위치
+====================
+service iptables status (6버전까지만)
+iptables -L --line (7버전)
+
+vi /etc/sysconfig/iptables
+
+====================
+방화벽을 사용하여 특정 IP 허용
+====================
+-A INPUT -s 192.168.1.8 -j ACCEPT
+
+====================
+방화벽을 사용하여 특정 IP 차단
+====================
+-A INPUT -s ip 주소 -j DROP
+
+====================
+방화벽을 사용하여 특정 Port 허용
+====================
+iptables -I INPUT 1 -p tcp --dport 443 -j ACCEPT 
+iptables -I INPUT 1 -p tcp --dport 1521 -j ACCEPT 
+-A INPUT -p tcp –dport 443 -j ACCEPT
+
+service iptables save
+service iptables restart
+====================
+방화벽을 사용하여 특정 Port 차단
+====================
+-A INPUT -p tcp –dport 443 -j DROP
+
+====================
+방화벽을 사용하여 특정 IP와 Port 차단
+====================
+-A INPUT -s 172.20.3.**-p tcp –dport 22 -j DROP
+
+====================
+방화벽을 사용하여 특정 IP와 Port를 차단한 후 방어된 로그 설정
+====================
+-I INPUT -s 172.20.3.** -p tcp –dport 22 -j LOG –log-prefix “[PLURA SSH Defend]”
+
+아래의 내용은 [Plura서비스]에서 보여지는 로그입니다.
+
+{“@ceelog”: {“timegenerated”:”2016-06-09T19:52:30.001446+09:00″,”programname”:”kernel”,”hostname”:”centos6″,”syslogtag”:”kernel:”,”pri”:”4″,”pri-text”:”kern.warning”,”syslogfacility”:”0″,”syslogfacility-text”:”kern”,”syslogseverity”:”4″,”syslogseverity-text”:”warning”,”msg”:”[PLURA SSH Defend]IN=eth0 OUT= MAC=08:00:27:d6:c6:1b:08:00:27:36:6b:8a:08:00 SRC=172.20.3.87 DST=172.20.3.84 LEN=60 TOS=0x00 PREC=0x00 TTL=64 ID=4198 DF PROTO=TCP SPT=34381 DPT=22 WINDOW=5840 RES=0x00 SYN URGP=0 “}}
+
+====================
+방화벽 설정이 완료되면, 방화벽을 재시작해줍니다.
+====================
+/etc/init.d/iptables restart 또는 service iptables restart
+
+
+[CentOS 7] firewall 사용방법
+
+기본 방화벽 시스템이 변경되었습니다. 이전에는 iptables를 사용했는데 CentOS 7 에서는 ‘firewalld’라는 방화벽 시스템이 기본으로 탑재되었습니다.
+
+방화벽에는 zone(영역)이라는 것이 존재합니다. 개방된 네트워크와 연결되어 있다면 public zone(공개영역)에 있는 룰이 적용되고, 개인 네트워크에 있다면 다른 zone의 룰을 적용할 수 있습니다.
+우리는 서버 용도로 리눅스를 사용하기 때문에 개방된 public zone만 필요합니다. 또한 방화벽에는 public zone이 기본 zone으로 설정되어있습니다.  방화벽 설정 파일에서 변경 가능합니다.
+
+====================
+public zone의 설정 파일
+====================
+vi /etc/firewalld/zones/public.xml
+
+====================
+방화벽 재시작
+====================
+firewall-cmd –reload
+
+====================
+포트 추가/제거
+====================
+추가 # firewall-cmd –permanent –zone=public –add-port=80/tcp
+
+제거 # firewall-cmd –permanent –zone=public –remove-port=80/tcp
+
+재시작 # firewall-cmd –reload
+
+====================
+서비스 추가/제거
+====================
+추가 # firewall-cmd –permanent –zone=public –add-service=http
+
+제거 # firewall-cmd –permanent –zone=public –remove-service=http
+
+재시작 # firewall-cmd –reload
+
+====================
+임의의 룰 추가/제거
+====================
+추가 # firewall-cmd –permanent –zone=public –add-rich-rule=”rule family=ipv4 source address= 192.168.0.4/24 service name=http accept”
+
+제거 # firewall-cmd –permanent –zone=public –remove-service=http”rule family=ipv4 source address= 192.168.0.4/24 service name=http accept”
+
+재시작 # firewall-cmd –reload
+
+====================
+[응용] http 서비스에서 특정 ip 차단 추가 및 해제
+====================
+차단 # firewall-cmd –permanent –zone=public –add-rich-rule=”rule family=ipv4 source address= 192.168.0.4 service name=http reject”
+
+해제 # firewall-cmd –permanent –zone=public –remove-service=http”rule family=ipv4 source address= 192.168.0.4 service name=http reject”
+
+재시작 # firewall-cmd –reload
+
+====================
+허용한 포트 목록
+====================
+firewall-cmd –list-ports
+
+====================
+방화벽 상태 확인
+====================
+firewall-cmd –state
+
+====================
+활성화된 zone 목록
+====================
+firewall-cmd –get-active-zones
+
+====================
+현재 존재하는 서비스 목록
+====================
+firewall-cmd –get-service
+
+====================
+public zone에 있는 서비스 목록
+====================
+firewall-cmd –zone=public –list-services
+
+[CentOS 7] iptables 사용방법
+
+현재 작동 중인 firewalld 데몬을 중지 시킨 후 재부팅시에도 올라오지 않도록 설정합니다.
+
+# systemctl stop firewalld
+
+# systemctl mask firewalld
+
+ 
+====================
+iptables 를 설치합니다.(OS설치시 웹서버 구성으로 설치시 자동 설치됨)
+====================
+# yum install iptables-services
+
+====================
+iptables 서비스 데몬 재부팅시 자동 설정합니다.
+====================
+# systemctl enable iptables
+
+====================
+iptables 서비스 시작합니다.(시작/재시작/중지)
+====================
+# systemctl start/restart/stop iptables
+ 
+====================
+iptables 재시작합니다.
+====================
+# systemctl restart iptables

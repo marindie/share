@@ -1,0 +1,43 @@
+=====================
+append after
+=====================
+sed -ie "/pattern/atext"
+sed -ie '/^search/a nameserver 127.0.0.1' filename
+
+=====================
+append before
+=====================
+sed -ie "/pattern/itext"
+sed -ie '/^search/i nameserver 127.0.0.1' filename
+
+=====================
+빈라인 제거 (문제는 전부다 제거함)
+=====================
+sed '/^\s*$/d' load_ori.ctl
+
+sed $'/badfile load.bad/{e cat list.txt\n}' load_ori.ctl
+
+=====================
+파일 맨 마지막에 넣기
+=====================
+sed -e "\$a\ \nif [ -z \"\$\{WL_HOME\}\" ]; then\n    . /was/weblogic1036/domains/updomain/bin/setDomainEnv.sh\nfi" /home/uapwas/.bashrc
+
+If you want to apply the changes in input.txt file. Then, use -i with sed.
+sed -i '/cdef/r add.txt' input.txt
+
+If you want to use a regex as an expression you have to use the -E tag with sed.
+sed -E '/RegexPattern/r add.txt' input.txt
+
+sed -e "/<property name=\"dist\" value=\"\${source}\/dist\"\/>/a test" IFSSimulation_build.xml
+
+sed -ie "/export USER_MEM_ARGS/i USER_MEM_ARGS=\"\${USER_MEM_ARGS} -Dweblogic.wsee.wstx.wsat.deployed=false\"" startM7070_J.sh
+
+sed -e "///" IFSSimulation_build.xml
+
+INFILE 'ldapflat-FILEDATE00'
+
+ldapflat-2018072700
+
+#/bin/bash
+
+for file in ls 

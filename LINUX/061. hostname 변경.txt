@@ -1,0 +1,5 @@
+# Centos7
+hostnamectl set-hostname nateifs01
+
+#Centos6
+vi /etc/sysconfig/network (재기동 필요)

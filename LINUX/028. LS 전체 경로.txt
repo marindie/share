@@ -1,0 +1,3 @@
+this for directory: ls -d -1 $PWD/**
+this for files: ls -d -1 $PWD/*.*
+this for everything: ls -d -1 $PWD/**/*

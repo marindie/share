@@ -1,0 +1,179 @@
+
+==============================================
+기존에 잘 동작하던 방식. (Centos 6 설치시에는 설치 중에 Network 설정 불가능. 파일 수정해야함)
+==============================================
+1. KVM 에서 GUI로 VM 추가
+
+2. Local iso 로 설치 하기 선택.
+사전에 iso 이미지는 다운 받아 놓자.
+192.168.1.200번 장비 marindie/wony12 계정으로 들어가서 iso 폴더에 보면 centos7 있음
+
+3. 이름, Memory, CPU, Disk 용량, 언어 선택
+
+4. Network 설정 버튼 클릭해서 설치된 네트워크 카드 활성화 시키고 Static 으로 세팅
+IPADDR=192.168.1.206
+GATEWAY=192.168.0.1
+NETMASK=255.255.0.0
+DNS1=8.8.8.8 (google)
+DNS1=8.8.8.4
+DNS3=168.126.63.1
+
+5. 설치 완료 후 root 랑 사용자 계정 생성 하고 재시작 하면 일단 OS 설치는 완료.
+로그인 후 hostname -I 로 IP 가 192.168.1.206 인지 확인
+ip addr show 로 상세 정보도 보고 싶으면 확인. 
+ping www.google.com 으로 ping 나가는지 테스트
+
+6. ssh 설치
+yum -y install openssh-server openssh-clients openssh-akspass
+systemctl status sshd 로 서비스 여부 확인 (안떠있으면, service sshd start)
+ss -nalt 로 22번 포트 리스닝 상태인지 확인
+
+7. 방화벽 22 번 TCP 등록
+firewall-cmd --list-all 로 리스트 확인
+firewall-cmd --permanent --zone=public --add-port=22/tcp
+firewall-cmd --reload 로 재시작
+firewall-cmd --list-all 로 리스트 확인
+ssh 툴로 원격 접속 시도
+
+8. 한글 처리
+ssh 로 접속시 한글이 깨져 보일수 있는데, 먼저 ssh 설정에서 font 가 한글이고
+인코딩이 utf-8인지 확인하자.
+cat /etc/locale.conf 으로 아래 처럼 되어 있으면 정상.
+LANG="ko_KR.UTF-8"
+
+9. ifconfig 설치
+yum -y install net-tools
+
+10. iptables 사용하기
+firewalld 가 보기 불편해서 중지함
+systemctl stop firewalld
+systemctl mask firewalld
+systemctl disable firewalld
+
+yum -y install iptables-services
+systemctl enable iptables
+systemctl start iptables
+iptables --flush
+iptables-save > /etc/sysconfig/iptables
+
+iptable 정보는 기존 장비들의 정보를 복사해서 사용했음.
+
+개발툴 설치
+yum groupinstall "Development Tools"
+
+아파치 실행시 필요한 라이브러리 rpm 다운받아서 설치
+rpm -i compat-db47-4.7.25-28.el7.i686.rpm
+
+
+==========================
+UBUNTU KVM 설치
+==========================
+Ubuntu host 에서 작업할 내용
+1. 가상화 지원 여부 확인
+egrep -c '(vmx|svm)' /proc/cpuinfo 
+
+2. kvm 관련 package install
+sudo apt-get install qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils
+
+3. 사용자 KVM 그룹에 추가
+sudo adduser widetns libvirtd (이건 없다고 나오는데???)
+sudo adduser widetns kvm
+
+4. KVM 명령어로 리스트 조회해보기. 의미 없음
+virsh -c qemu:///system list
+
+5. GUI Virtual Machine Manager 실행. 마우스로 실행이 실패하는 경우는 해당 계정이 실행 명령관련 파일 권한이 없는것임. 그룹에 추가하든 뭐하든하면됨.
+난 그냥 root virt-manager 실행해서 권한 건너띔.
+sudo virt-manager
+
+============================
+Ubuntu 네트워크 설정 관련.
+============================
+Ubunut 18.04 이전 버전에서는 
+network-manager 와 /etc/network/interfaces 파일의 내용을 수정으로 해서 static IP 랑 bridge 를 세팅했다면,
+Ubunut 18.04 버전 부터는 netplant 이라는 녀석을 사용해야함.
+
+vi /etc/netplan/XXXXXXXX.yaml 파일이 기본적으로 한개 존재함. 해당 파일에서 내용을 수정해야함.
+
+==========
+/etc/netplan/01-network-manager-all.yaml 내용
+==========
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: no
+      dhcp6: no
+  
+  bridges:
+    br0:      
+      interfaces: [eno1]
+      dhcp4: no
+      dhcp6: no
+      addresses: [192.168.1.200/23]
+      gateway4: 192.168.0.1
+      parameters:
+        stp: false
+        forward-delay: 0
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4, 168.126.63.1]
+
+반영 후에는 그냥 맘편하게 reboot
+-- 설명
+renderer 를 networkd device 로 세팅하고
+ethernet eno1 (ifconfig 치면 이름 나옴) 을 bridge 에 물리겠다는 의미로 세팅하는것임.
+bridges br0 을 이름을 부여하고
+아래에 static 으로 정보들을 세팅함. 이렇게 되면 eno1 이 br0 에 물려짐.
+나중에 vm 을 띄우게 되면, vnet0 순으로 붙게 될텐데 brctl show 를 해서 아래처럼 
+interfaces 에 eno1, vnet0 이 출력 된다면. KVM 에서 network bridge 세팅이 잘 된것임.
+bridge name     bridge id               STP enabled     interfaces
+br0             8000.d697e0a20d58       no              eno1
+                                                        vnet0
+
+여기까지 세팅이 되었음에도 불구하고 host ip 로만 핑이 나가고, gateway 와 internet 접속이 안되는 현상이 발생.
+아래의 내용으로 해결
+vi /etc/sysctl.conf 
+아래 설정을 맨 밑이든 어디든 추가 후 저장
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0 
+
+sysctl -p /etc/sysctl.conf 명령으로 세팅 다시 불러옴.
+
+KVM 에서는 Centos6 로 설치했는데, Centos 6 static IP 세팅을 하면 끝.
+Centos 6, 7 설치는 맨위에 내용 참고해서 설치 진행하면 됨.
+
+
+==============================
+Ubuntu 12 버전 세팅 내용
+==============================
+vi /etc/network/interfaces 내용을 아래 내용으로 채움.
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+auto eth0
+iface eth0 inet static
+        address 192.168.1.200
+        netmask 255.255.254.0
+        gateway 192.168.0.1
+        dns-nameservers 8.8.8.8 8.8.4.4 168.126.63.1
+
+auto eth1
+iface eth1 inet manual
+ 
+auto xenbr0
+iface xenbr0 inet manual
+        bridge_ports eth1
+        bridge_stp off
+        bridge_fd 0
+        bridge_maxwait 0
+		
+이게 어떻게 인터넷이 잡히는지 나는 잘 이해는 가지 않음.
+내가 구성한 방식은 비유 하자면 xenbr0 에 eth0 을 물려서 사용하는 방식이기에, eth1 이 어떻게 돌아가는건지 잘 이해가 가지 않음.
+아무튼 기록을 남기려고 글을 남김.		

@@ -1,0 +1,6 @@
+# For Mac, make sure you installed good sed. If the following sed command not work, then enter "brew install gnu-sed" to install sed. Make sure you have a homebrew 
+# Then you may have to use gsed since it prefix with g during installation
+# To Check Matching Text run this
+gsed -n -r -e "s/SEGMENT CREATE IMMEDIATE|SEGMENT CREATE DEFERRERD//gp" *.SQL 
+# Then Run to remove the syntax
+gsed -i'' -r -e "s/SEGMENT CREATE IMMEDIATE|SEGMENT CREATE DEFERRED//g" *.SQL

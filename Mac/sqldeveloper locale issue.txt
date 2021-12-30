@@ -1,0 +1,12 @@
+sqldeveloper에서 우클릭 (혹은 ctrl+클릭) 패키지 내용보기 후 
+
+Contents/Resources/sqldeveloper/sqldeveloper/bin/sqldeveloper.conf파일을 열어
+
+다음과 같은 옵션을 추가 한다.
+
+
+
+AddVMOption -Duser.language=ko
+
+AddVMOption -Duser.country=KR 
+

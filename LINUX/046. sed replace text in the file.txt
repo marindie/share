@@ -1,0 +1,43 @@
+sed -ie "s/$x/$y/g" /tmp/file.txt
+
+sed 's/abc/XYZ/g' <infile >outfile
+
+find ./ -type f -exec sed -i 's/abc/XYZ/gi' {} \;
+find ./ -iname "*.py" -type f -exec sed -i 's/abc/XYZ/gi' {} \;
+
+sed "s/<property file=\"\/was\/upwas\/WebApp\/COMMON\/conf\/uaps.properties\"\/>/<property name=\"uapsportal.class.dir\" value=\"\/was\/upwas\/WebApp\/PORTAL2\/WEB-INF\/classes\"\/>/g" *.xml
+
+# delete all lines matching foobar 
+ed -s test.txt <<< $'g/foobar/d\nw' 
+
+Input:
+
+abI am jhoncd
+ab32.58cd
+abI live in USAcd
+ab22. I was born in NYcd
+ab58.2cd
+ef
+output:
+
+32.58
+58.2
+
+sed -n -r 's/^ab([^[:alpha:]]+)cd/\1/p' file
+sed -n -r 's/ab([[:digit:].]+)cd/\1/p' file
+32.58
+58.2
+
+awk '/^ab([^[:alpha:]]+)cd/{gsub(/ab|cd/,""); print}' file
+awk '/ab([[:digit:].]+)cd/{gsub(/ab|cd/,""); print}' file
+awk '/^ab[^a-z]+cd$/{gsub(/ab/,""); gsub(/cd/,""); print}' file
+awk '/^ab[^[:alpha:]]+cd$/{gsub(/ab/,""); gsub(/cd/,""); print}' file
+32.58
+58.2
+
+#변경 명령어 리스트
+sed -i'' -r -e "s/profile.server.use=./profile\.server\.use=N/" /svc/cds/was/app/cdsWebApp/WEB-INF/conf/cdssvc11.properties
+
+# TABLE_DDL.SQL INDEX_DDL.SQL 에서 SEGMENT 부분 삭제
+sed -i'' -r -e "s/SEGMENT CREATION IMMEDIATE|SEGMENT CREATION DEFERRED//p" TABLE_DDL.SQL 
+sed -i'' -r -e "s/SEGMENT CREATION IMMEDIATE|SEGMENT CREATION DEFERRED//p" INDEX_DDL.SQL 
