@@ -1,0 +1,12 @@
+===================
+gitlab ee 설치 ubuntu 20.04
+===================
+gitlab ee core 는 ce와 완전 동일
+gitlab ee 30일 무료 후 유료 전환 정책을 가지고 있음.
+하지만 유료로 전환하지 않으면 그대로 무료 core 만 가지고 사용이 가능함.
+
+sudo apt-get update
+sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
+sudo apt-get install -y postfix
+curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
+sudo EXTERNAL_URL="https://gitlab.example.com" apt-get install gitlab-ee
