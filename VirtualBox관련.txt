@@ -4,3 +4,10 @@ Virtual Box 공유 IP 설정
 IP 192.168.137.101 ~
 Subnet 255.255.255.0
 Gateway IP 192.168.137.1
+DNS 192.168.137.1
+
+네트워크 -> 호스트 전용 어댑터 -> 고급의 무작위모드 모두허용
+네트워크 -> Virtual Host-Only Ethernet Adapter 에서 IP 192.168.137.1 로 변경
+파일 -> 호스트 네트워크 관리자 -> dhcp 해제
+
+sudo mount -t vboxsf ShareFolder /home/nx/share

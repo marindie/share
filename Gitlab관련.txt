@@ -10,3 +10,12 @@ sudo apt-get install -y curl openssh-server ca-certificates tzdata perl
 sudo apt-get install -y postfix
 curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
 sudo EXTERNAL_URL="https://gitlab.example.com" apt-get install gitlab-ee
+
+== PORT 확인
+sudo vi /etc/gitlab/gitlab.rb
+external_port
+
+== ROOT 암호
+sudo cat /etc/gitlab/initial_root_password
+
+root/password

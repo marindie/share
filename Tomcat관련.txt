@@ -2,3 +2,21 @@
 tomcat8 ubuntu 20.04 설치
 =========================
 https://junyharang.tistory.com/18
+
+/usr 밑에 받아주면 됨
+sudo wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.9/bin/apache-tomcat-8.5.9.tar.gz
+sudo tar xvfz apache-tomcat-8.5.9.tar.gz
+sudo ln -s apache-tomcat-8.5.9 tomcat
+cd /usr/tomcat/bin
+./version.sh
+
+/etc/profile
+export JAVA_HOME=/usr/lib/java
+export CATALINA_HOME=/usr/tomcat
+export CLASSPATH=.:$JAVA_HOME/jre/lib/ext:$JAVA_HOME/lib/tools.jar:$CATALINA_HOME/lib/jsp-api.jar:$CATALINA_HOME/lib/servlet-api.jar
+source /etc/profile
+
+usermod -aG sudo newuser
+
+== java 설치 경로 확인
+udpate-alternatives --list java

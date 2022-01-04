@@ -6,9 +6,32 @@ sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sour
 sudo apt update
 sudo apt install jenkins
 sudo systemctl start jenkins
+sudo systemctl stop jenkins
 sudo systemctl status jenkins
+
+sudo vi /etc/default/jenkins   HTTP_PORT
+cat /var/lib/jenkins/secrets/initialAdminPassword
+
+== jenkins 기본 설치 경로
+/var/lib/jenkins
+
+== maven repository 경로
+/var/lib/jenkins/.m2/repository/
+
+== maven settings 경로
+/etc/maven/settings.xml
+
+== ^M 없에는 명령어
+vi 에서 
+:e ++ff=dos
+:set ff=unix
+:wq
+
+Ctrl+V Ctrl+M to insert that ^M
 
 이거는 그냥 참고만.. 사용할 필요 없음
 sudo ufw allow 8080
 sudo ufw enable
 sudo ufw status
+
+admin/admin

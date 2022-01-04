@@ -1,0 +1,201 @@
+== svn 설치 및 웹 환경 설치(아파치)
+sudo apt install subversion apache2 libapache2-mod-svn apache2-utils
+
+== svn repository 생성 파일시스템 방식
+sudo mkdir /svn
+sudo svnadmin create --fs-type fsfs /svn/cm
+
+== 계정 사용 설정
+vi svnserve.conf
+anon-access = none
+auth-access = write
+password-db = passwd
+authz-db = authz
+
+== 계정 등록
+vi conf/passwd
+user01 = user01
+
+== 권한 등록
+vi conf/authz
+[/]
+*=rw
+user01=rw
+
+== svn 포트 방화벽 열기
+ufw allow 9091/tcp
+
+
+== 웹으로 접속할 계정 생성
+sudo htpasswd -c /svn/repo/cm/conf/webpasswd admin (처음에는 c)
+sudo htpasswd /svn/repo/cm/conf/webpasswd marindie (그다음 부터는 없이)
+
+== 아파치 설정
+sudo vi /etc/apache2/mods-enabled/subversion.conf
+
+==============================
+<Location /svn/cm>
+    DAV svn
+    SVNPath /svn/repo
+    AuthType Basic
+    AuthName "subversion"
+    AuthUserFile /svn/repo/conf/webpasswd
+    
+    # 등록된 사용자만 읽기 가능.
+    <Limit GET PROPFIND OPTIONS REPORT>
+    	Require valid-user
+    </Limit>
+    
+    # 등록된 사용자 중 특정 사용자만 쓰기 가능
+    <LimitExcept GET PROPFIND OPTIONS REPORT>
+    	Require user manager
+    </LimitExcept>
+</Location>
+
+여기까지 내용 복사
+==============================
+
+== 아파치 시작시 svn 정보 읽어도오록 설정
+cd /etc/apache2/mods-enabled/
+sudo mv subversion.conf ../mods-available/
+sudo ln -s ../mods-available/subversion.conf subversion.conf
+
+== 아파치 포트 변경
+sudo vi /etc/apache2/ports.conf
+
+== 아파치 재시작
+sudo /etc/init.d/apache2 restart
+
+== 주소 접속
+http://192.168.137.101:8085/svn/repo/
+admin/admin
+
+== svn demon 죽이기
+sudo killall svnserve
+
+== svn demon 띄우기
+sudo svnserve -d --listen-port 9091 --listen-host 127.0.0.1 -r /svn/repo
+
+== trunc branches tag 만들기
+sudo svn mkdir --parents svn://127.0.0.1:9091/cm/trunk --username=marindie
+sudo svn mkdir --parents svn://127.0.0.1:9091/cm/branches --username=marindie
+sudo svn mkdir --parents svn://127.0.0.1:9091/cm/tags --username=marindie
+
+sudo svn import -m "Init CM Project" /home/nx/cmNx svn://127.0.0.1:9091/cm/trunk
+
+
+sudo vi /etc/rc.local
+svnserve -d -r /svn/svnrepo
+
+cd /etc/init.d
+sudo vi svnserve
+
+== can not connect to host
+sudo apt-get install cyrus-sasl-md5
+
+
+================================================================
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          svnserve
+# Required-Start:    $local_fs $syslog $remote_fs
+# Required-Stop:     $local_fs $syslog $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start svnserve
+### END INIT INFO
+
+# Author: Michal Wojciechowski <odyniec@odyniec.net>
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="svnserve"
+NAME=svnserve
+DAEMON=/usr/bin/$NAME
+DAEMON_ARGS="-d -r /svn/svnrepo --listen-port 9091"
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+[ -x "$DAEMON" ] || exit 0
+
+[ -r /etc/default/$NAME ] && . /etc/default/$NAME
+
+. /lib/init/vars.sh
+
+. /lib/lsb/init-functions
+
+do_start()
+{
+        start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null \
+                || return 1
+                        start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
+                                $DAEMON_ARGS \
+                                || return 2
+                        }
+
+                do_stop()
+                {
+                        start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+                        RETVAL="$?"
+                        [ "$RETVAL" = 2 ] && return 2
+                        start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
+                        [ "$?" = 2 ] && return 2
+                        rm -f $PIDFILE
+                        return "$RETVAL"
+                }
+
+        case "$1" in
+                start)
+                        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+                        do_start
+                        case "$?" in
+                                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+                        esac
+                        ;;
+                stop)
+                        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+                        do_stop
+                        case "$?" in
+                                0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+                                2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+                        esac
+                        ;;
+                restart|force-reload)
+                        log_daemon_msg "Restarting $DESC" "$NAME"
+                        do_stop
+                        case "$?" in
+                                0|1)
+                                        do_start
+                                        case "$?" in
+                                                0) log_end_msg 0 ;;
+                                                1) log_end_msg 1 ;; # Old process is still running
+                                                *) log_end_msg 1 ;; # Failed to start
+                                        esac
+                                        ;;
+                                *)
+                                        # Failed to stop
+                                        log_end_msg 1
+                                        ;;
+                        esac
+                        ;;
+                *)
+                        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+                        exit 3
+                        ;;
+        esac
+
+        exit 0
+================================================================		
+
+sudo chmod u+x /etc/init.d/svnserve
+sudo update-rc.d svnserve defaults
+sudo service svnserve start
+netstat -lntp
+
+svnserve -d --listen-port 9091 --listen-host 127.0.0.1 -r /svn/repo
+
+svn://192.168.137.101:9091/svnrepo/trunk
+
+
+
+
