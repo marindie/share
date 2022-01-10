@@ -1,0 +1,22 @@
+--데이터 import
+imp icscmapp/slccmapp file=bakupCM_2021-07-07.dmp fromuser=icscmapp touser=icscmapp
+imp icscsapp/slccsapp file=bakupCS_2021-07-07.dmp fromuser=icscsapp touser=icscsapp
+imp icsamapp/slcamapp file=bakupAM_2021-07-07.dmp fromuser=icsamapp touser=icsamapp
+imp icsrcapp/slcrcapp file=bakupRC_2021-07-07.dmp fromuser=icsrcapp touser=icsrcapp
+
+imp icsstapp/slcstapp file=bakupST_2021-07-07.dmp fromuser=icsstapp touser=icsstapp
+
+imp icscpapp/slccpapp file=bakupCP_2021-07-07.dmp fromuser=icscpapp touser=icscpapp
+
+
+imp icsecmapp/slcecmapp file=bakupECM_2021-07-07.dmp fromuser=icsecmapp touser=icsecmapp
+imp icsemsapp/slcemsapp file=bakupEMS_2021-07-07.dmp fromuser=icsemsapp touser=icsemsapp
+imp icsetcapp/slcetcapp file=bakupETC_2021-07-07.dmp fromuser=icsetcapp touser=icsetcapp
+
+
+--자원순환
+imp userid=icsrrapp/slcrrapp@slcics file=open_bakupRR_2021-07-13.dmp fromuser=icsrrapp touser=icsrrapp
+
+--농협펌뱅킹, 올바로시스템
+imp icsnhapp/slcnhapp file=bakupNH_2021-07-13.dmp fromuser=icsnhapp touser=icsnhapp
+imp icsabapp/slcabapp file=bakupAB_2021-07-13.dmp fromuser=icsabapp touser=icsabapp
