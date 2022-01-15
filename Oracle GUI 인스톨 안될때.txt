@@ -1,0 +1,38 @@
+root user로 변경한 후  xhost +를 실행
+
+#xhost +
+
+ access control disabled, clients can connect from any host ->>나와도 상관없음.
+
+#xclock(화면에 UI로 아날로그 시계가 뜬다. 시계를 닫고)
+
+#xterm(다른 화면으로 터미널이 뜬다. user는 root이다.)
+
+#xclock (다시 시계가 뜨는지 확인후 시계를 닫는다.)
+
+#echo $DISPLAY(display를 확인한다.)
+
+:0
+
+ 
+
+#su – oracle(오라클 계정으로 변경)
+
+$xclock(시계가 뜨는지 확인한다.- 아마도 에러가 날것이다.)
+
+Error: can’t open display
+
+ 
+
+$export DISPLAY=:0(DISPLAY 값을 root계정의 DISPLAY 값과 동일하게 맞춰 준다.)
+
+$xclock (다시 시계가 뜨는지확인)
+
+$./runInstaller
+
+정상적으로 실행이되어 화면이 나온다
+
+[polldaddy rating=”7739789″]
+
+export LANG=C
+export LC_ALL=C
