@@ -42,3 +42,14 @@ mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file  -Dfile=
 mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
 mvn install:install-file -Dfile=<path-to-file> -DpomFile=<path-to-pomfile>
 mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=<path-to-file>
+
+
+
+
+<dependency>
+    <groupId>그룹아이디</groupId>
+    <artifactId>아티팩트아이디</artifactId>
+    <version>버전</version>
+    <scope>system</scope>
+    <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/파일명.jar</systemPath>
+</dependency>
