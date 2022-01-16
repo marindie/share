@@ -1,0 +1,15 @@
+
+
+mvn install:install-file -Dfile=파일경로/파일명.jar -DgroupId=그룹아이디 -DartifactId=아티팩트아이디 -Dversion=버전 -Dpackaging=jar 
+
+mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file  -Dfile=path-to-your-artifact-jar \
+                                                                              -DgroupId=your.groupId \
+                                                                              -DartifactId=your-artifactId \
+                                                                              -Dversion=version \
+                                                                              -Dpackaging=jar \
+                                                                              -DlocalRepositoryPath=path-to-specific-local-repo
+
+mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
+mvn install:install-file -Dfile=<path-to-file> -DpomFile=<path-to-pomfile>
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=<path-to-file>
+
