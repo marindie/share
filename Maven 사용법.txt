@@ -1,3 +1,29 @@
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\cos-1.0.0.jar -DgroupId=cos -DartifactId=cos -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\nexacro-xapi-1.0.0.jar -DgroupId=com.nexacro.java.xapi -DartifactId=nexacro-xapi -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\nexacro-xeni-java-1.0.0.jar -DgroupId=com.nexacro.java.xeni -DartifactId=nexacro-xeni-java -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\uiadapter-spring-core-1.0.0.jar -DgroupId=com.nexacro.uiadapter.spring -DartifactId=uiadapter-spring-core -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\uiadapter-spring-dataaccess-1.0.0.jar -DgroupId=com.nexacro.uiadapter.spring -DartifactId=uiadapter-spring-dataaccess -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\Egov3100\nexacro_lib\uiadapter-spring-excel-1.0.0.jar -DgroupId=com.nexacro.uiadapter.spring -DartifactId=uiadapter-spring-excel -Dversion=1.0.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.bat.core-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.bat.core -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.access-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.access -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.cmmn-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.cmmn -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.crypto-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.crypto -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.excel-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.excel -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.filehandling-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.filehandling -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.idgnr-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.idgnr -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.logging-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.logging -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.property-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.property -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.security-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.security -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.string-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.string -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.fdl.xml-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.fdl.xml -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.psl.dataaccess-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.psl.dataaccess -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\egovframework.rte.ptl.mvc-3.10.0.jar -DgroupId=egovframework.rte -DartifactId=egovframework.rte.ptl.mvc -Dversion=3.10.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+D:\Egov3100\apache-maven-3.8.4\bin\mvn install:install-file -Dfile=D:\egov_lib\sndng-mail-1.0.jar -DgroupId=egovframework.rte -DartifactId=sndng-mail -Dversion=1.0 -Dpackaging=jar -DlocalRepositoryPath=D:\Egov3100\maven\repository
+
+
+
+
 
 
 mvn install:install-file -Dfile=파일경로/파일명.jar -DgroupId=그룹아이디 -DartifactId=아티팩트아이디 -Dversion=버전 -Dpackaging=jar 
@@ -12,4 +38,3 @@ mvn org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file  -Dfile=
 mvn install:install-file -Dfile=<path-to-file> -DgroupId=<group-id> -DartifactId=<artifact-id> -Dversion=<version> -Dpackaging=<packaging>
 mvn install:install-file -Dfile=<path-to-file> -DpomFile=<path-to-pomfile>
 mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=<path-to-file>
-
