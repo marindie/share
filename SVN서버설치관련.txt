@@ -1,9 +1,67 @@
+sudo adduser svn
+sudo usermod -aG sudo svn
+
 == svn 설치 및 웹 환경 설치(아파치)
-sudo apt install subversion apache2 libapache2-mod-svn apache2-utils
+sudo apt install apache2 apache2-utils
+sudo apt install subversion libapache2-mod-svn subversion-tools libsvn-dev
+
+== 아파치 기동
+sudo systemctl start apache2.service
+sudo systemctl enable apache2.service
+
+== Apache2 modules run SVN to function
+a2enmod dav
+a2enmod dav_svn
+
+== Apache2 with SVN 설정
+sudo vi /etc/apache2/mods-enabled/dav_svn.conf
+
+<Location /svn>
+	DAV svn
+	SVNParentPath /svn/repo
+	
+	AuthType= Basic
+	AuthName= "Subversion Repository"
+	AuthUserFile /etc/apache2/dav_svn.passwd
+	
+	<LimitExcept GET PROPFIND OPTIONS REPORT>
+		Require valid-user
+	</LimitExcept>
+</Location>
+save
 
 == svn repository 생성 파일시스템 방식
-sudo mkdir /svn
-sudo svnadmin create --fs-type fsfs /svn/cm
+sudo mkdir /svn/repo
+sudo svnadmin create --fs-type fsfs /svn/repo/IC-SPRING
+sudo svnadmin create --fs-type fsfs /svn/repo/IC-NEXA
+sudo svnadmin create --fs-type fsfs /svn/repo/IC-BATCH
+sudo svnadmin create --fs-type fsfs /svn/repo/IC-CUSTOMER
+sudo chmod -R go+w /svn/repo
+
+sudo htpasswd -cm /etc/apache2/dav_svn.passwd admin
+sudo htpasswd -m /etc/apache2/dav_svn.passwd wony
+sudo htpasswd -m /etc/apache2/dav_svn.passwd dkswnsgh12
+sudo htpasswd -m /etc/apache2/dav_svn.passwd codenameyong
+sudo htpasswd -m /etc/apache2/dav_svn.passwd wony
+sudo htpasswd -m /etc/apache2/dav_svn.passwd wony
+
+sudo systemctl restart apache2.service
+
+== apache port 설정
+sudo vi /etc/apache2/ports.conf
+
+sudo vi /etc/apache2/sites-enabled/000-default.conf
+
+== svn demon 죽이기
+sudo killall svnserve
+
+== svn demon 띄우기
+sudo svnserve -d --listen-port 9091 --listen-host 0.0.0.0 -r /svn/repo
+
+== 아파치 재기동
+sudo systemctl restart apache2.service
+
+===============================================================
 
 == 계정 사용 설정
 vi svnserve.conf
@@ -24,6 +82,8 @@ user01=rw
 
 == svn 포트 방화벽 열기
 ufw allow 9091/tcp
+ufw allow 22/tcp
+ufw allow 8055/tcp
 
 
 == 웹으로 접속할 계정 생성
@@ -75,6 +135,9 @@ sudo killall svnserve
 
 == svn demon 띄우기
 sudo svnserve -d --listen-port 9091 --listen-host 127.0.0.1 -r /svn/repo
+
+== svn demon 확인
+sudo ps -ef | grep svnserve
 
 == trunc branches tag 만들기
 sudo svn mkdir --parents svn://127.0.0.1:9091/cm/trunk --username=marindie
