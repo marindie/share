@@ -119,7 +119,8 @@ databaseType=MULTIPURPOSE  => 데이터베이스 유형 선택(MULTIPURPOSE|DATA
 sampleSchema=TRUE              => 샘플스키마 설치 여부 (Default False)
 totalMemory=2048    => 데이타베이스에 사용될 메모리, MB 단위
 
-
+$ORACLE_HOME/dbs/initSLCICS.ora 
+kill -9 `ps -ef | grep slcics | grep -v grep | awk '{print $2}'`
 
 
 dbca -silent -createDatabase  -templateName General_Purpose.dbc  -gdbname MY_CDB -sid MY_CDB -responseFile NO_VALUE \
