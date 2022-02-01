@@ -1,0 +1,38 @@
+====================
+Download
+====================
+다운로드 경로
+http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+기본적으로 zip 파일로 설치하면 binary 로 만들어져 있어서 installation 과정 없이 
+environment 설정 만으로 바로 sqlplus 사용가능.
+
+1. 파일 다운 로드
+unzip -q instantclient-basic-linux.x64-11.2.0.4.0.zip 
+unzip -q instantclient-sqlplus-linux.x64-11.2.0.4.0.zip
+실행 하고 나면 하나의 폴더에 내용이 담기게 됨.
+
+2. 환경 설정 (root 계정으로 실행)
+groupadd dba
+useradd -m -d /home/oracle -g dba -s /bin/bash oracle
+passwd oracle (wideps1! 추천)
+
+mkdir -p /software/oracle/product/client (없는 폴더도 다 만듬)
+cp -rp instantclient_11_2 /software/oracle/product/client/
+chown -R oracle:dba /software (software 이하의 폴더 권한을 oracle 계정에 dba로 세팅)
+
+
+vi /etc/profile (모든유저가 해당 환경 설정 정보를 받도록 하기 위해 수정)
+아래내용 복붙 하고 저장
+export LD_LIBRARY_PATH=/software/oracle/product/client/instantclient_11_2:${LD_LIBRARY_PATH}
+export PATH=/software/oracle/product/client/instantclient_11_2:${PATH}
+export SQLPATH=/software/oracle/product/client/instantclient_11_2:${SQLPATH}
+export NLS_LANG=KOREAN_KOREA.KO16MSWIN949
+export TNS_ADMIN=/software/oracle/product/client/instantclient_11_2
+
+su - oracle (oracle 계정 접속)
+cd $TNS_ADMIN 
+
+vi tnsnames.ora 
+204 번의 $ORACLE_HOME/network/admin/tnsnames.ora 내용 복사해서 붙여넣고 저장
+
+sqlplus upadm/oracle08@WIDEDEV 하면 잘될거임

@@ -1,0 +1,391 @@
+=======================
+접속 URL
+=======================
+https://192.168.1.205:444/login/autoLogin.do?user_id=&pos=LEFT
+
+=======================
+log 파일 위치
+=======================
+/was/weblogic1036/domains/updomain/logs/uapsPortal2/
+/logs/weblogic1036/updomain/
+/logs/was/portal/
+
+
+=======================
+portal 서버 설정 정보
+=======================
+크게 중요한 정보들은 아닌듯
+/was/upwas/WebApp/COMMON/conf/ldapdev.properties
+/was/upwas/WebApp/PORTAL/WEB-INF/conf/uaps_portal.properties
+/was/upwas/WebApp/COMMON/conf/portal.properties
+
+=======================
+jennifer 설정 정보
+=======================
+/was/weblogic1036/domains/jennifer4053/agent/conf/4pt.conf
+
+=======================
+jdbc 설정 정보
+=======================
+웹로직 Admin Console에서 설정한 값들이 저장됨
+/was/weblogic1036_uapis4/domains/updomain/config/jdbc
+
+=======================
+Weblogic AES 값 생성 하는법
+=======================
+/was/weblogic1036/domains/updomain/bin
+. ./setDomainEnv.sh
+
+java weblogic.WLST
+es = encrypt('weblogic') {AES}8oxKvwjfH+gP3cNEPPC9aQPA2y/ahtW91yDoMlwIuXI=
+es = encrypt('password') {AES}ovaufYl+xZHzZ6y1X0tc19P5eboMFBxhr+/NqitcvaM=
+print es
+
+또는
+
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.security.Encrypt upadm
+{AES}ZAhMTAXmw0GxCA7v4iyhm/Tbo6nLLax3jFmY3W/sIDA=
+
+참고로 기존 비번암호화된 값
+/was/weblogic1036_uapis4/domains/updomain/config/jdbc
+{AES}PvUPnHgPQhPz0LjUvOldwMaIumw8UXKKXe5YK/0MLvE=
+
+
+=======================
+weblogic 비밀번호 초기화
+=======================
+1.환경설정 로딩
+cd /was/weblogic1036/domains/updomain/bin
+. ./setDomainEnv.sh
+
+2. 신규 암호 설정
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.security.utils.AdminAccount upadm upadm .
+
+3. 데이터 백업
+cd /was/weblogic1036/domains/updomain/security 
+DefaultAuthenticatorInit.ldift 백업
+
+cd /was/weblogic1036/domains/updomain/servers/AdminServer/data/ldap/
+mv DefaultAuthenticatormyrealmInit.initialized DefaultAuthenticatormyrealmInit.initialized_backup
+
+4. 새로운 기동 권한 정보 입력
+cd /was/weblogic1036/domains/updomain
+vim boot.properties
+password=[새로운암호]
+username=[새로운아이디]
+
+5. 재기동
+- 재기동시에 새로운 계정/암호를 암호화 하는 시간이 약간 소요될 수 있음
+
+각 서버별로 3번 작업을 진행해 주고 재기동 해야 신규 정보가 반영됨
+
+===============================
+DB 연결 확인
+===============================
+java utils.dbping ORACLE upadm upadm db@server:port
+sqlplus upadm/upadm@192.168.1.204:1521/WIDEDEV
+
+shutdown immediate
+startup
+
+1. 리스너 구동하기
+lsnrctl start  : 리스너 구동하기
+lsnrctl stop  : 리스너 중단하기 
+
+이 명령어는 오라클이 설치되어 있는 서버에서 실행해야 한다. 
+당연 oracle 유저로 실행해야 먹을 것이다. 
+윈도우 커맨드모드에서 실행하는 client 용 명령어는 아니다.
+
+2. 리스너 환경 파일
+$ORACLE_HOME/network/admin  아래에 있는 tnsnames.ora
+
+===============================
+자바 버전 변경 CentOS
+===============================
+JAVA 버전 확인
+java version "1.8.0_72"
+Java(TM) SE Runtime Environment (build 1.8.0_72-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 25.72-b15, mixed mode)
+
+java version "1.7.0_79"
+Java(TM) SE Runtime Environment (build 1.7.0_79-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 24.79-b02, mixed mode)
+
+JAVA 버전 변경
+alternatives --config java
+alternatives --config javac
+
+vi /etc/profile
+
+아래의 파일은 /usr/bin/java 또는 javac의 심볼링 링크 파일이며 그 파일들은
+자바 파일에 연동되어있다. 우선 이전 버전의 심볼릭 링크를 삭제한다.
+
+ll  /etc/alternatives/java
+rwxrwxrwx 1 root root 46 2016-12-26 10:25 /etc/alternatives/java -> /usr/lib/jvm/jre-1.7.0-openjdk.x86_64/bin/java
+lrwxrwxrwx. 1 root root 30 2017-04-07 15:28 /etc/alternatives/java -> /usr/java/default_1.8/bin/java => 파일서버 기존 링크
+
+ll  /etc/alternatives/javac
+lrwxrwxrwx 1 root root 48 2016-12-26 09:58 /etc/alternatives/javac -> /usr/lib/jvm/java-1.7.0-openjdk.x86_64/bin/javac
+
+rm  /etc/alternatives/java
+rm  /etc/alternatives/javac
+
+그뒤 다운받은 1.8.0을 설정해준다.
+
+ln -s /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java /etc/alternatives/java
+ln -s /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/javac /etc/alternatives/javac
+ln -s /usr/java/jdk1.6.0_14_real/jre/bin/java /etc/alternatives/java
+ln -s /usr/java/jdk1.6.0_14_real/bin/javac /etc/alternatives/javac
+ln -s /usr/java/jdk1.7.0_79/jre/bin/java /etc/alternatives/java
+ln -s /usr/java/jdk1.7.0_79/bin/javac /etc/alternatives/javac
+
+이 부분도 추가하면 될듯하나 확인이 필요하다.
+vi /etc/profile
+export JAVA_HOME=java-1.8.0-openjdk-1.8.0.111-0.b15.el6_8.x86_64
+export PATH=/usr/lib64/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:$JAVA_HOME/bin
+
+아래대로 하면 아주아주 손쉽게 처리가 가능하다.
+alternatives --install /usr/bin/jar jar /usr/java/jdk1.7.0_79/bin/jar 1
+alternatives --install /usr/bin/java java /usr/java/jdk1.6.0_14_real/bin/java 2
+alternatives --install /usr/bin/javac javac /usr/java/jdk1.6.0_14_real/bin/javac 2
+alternatives --install /usr/bin/java java /usr/java/jdk1.7.0_79/bin/java 2
+alternatives --install /usr/bin/javac javac /usr/java/jdk1.7.0_79/bin/javac 2
+alternatives --set jar /usr/java/jdk1.7.0_79/bin/jar 
+alternatives --set javac /usr/java/jdk1.7.0_79/bin/javac
+
+alternatives --config java
+alternatives --config javac
+
+[root@localhost jvm]# java -version
+openjdk version "1.8.0_111"
+OpenJDK Runtime Environment (build 1.8.0_111-b15)
+OpenJDK 64-Bit Server VM (build 25.111-b15, mixed mode)
+
+[root@localhost jvm]# javac -version
+javac 1.8.0_111
+
+=====================================================================
+Weblogic Java 버전 변경
+=====================================================================
+/was/weblogic1036/wlserver_10.3/common/bin/commEnv.sh
+/was/weblogic1036/domains/updomain/bin/setDomainEnv.sh
+적용시 적용안함. 서버 시작 스크립트에서 버전을 명시하기때문
+
+=====================================================================
+도메인 설정 마법사
+=====================================================================
+설치된 곳의 디렉토리 중 /설치한 곳/common/bin으로 가보면, 유닉스 경우 dmwiz.sh 파일이, 윈도
+우 경우 dmwiz.cmd 파일이 있을것이다. 이 파일은 도메인 설정 마법사 파일이다. 
+
+=====================================================================
+Weblogic 중지 명령어
+=====================================================================
+"${JAVA_HOME}/bin/java" weblogic.Admin -url t3://설정한주소:7001 SHUTDOWN -username admin
+-password admin123
+
+=====================================================================
+Weblogic 상태확인 명령어
+=====================================================================
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.Admin -username weblogic -password nate_zzang -url 192.168.1.205:7050 GETSTATE
+
+=====================================================================
+Jar 파일 압축 해제
+=====================================================================
+jar -xvf filenameApp.jar
+
+=====================================================================
+cache 정보 날리고 다시 재부팅시도 (더 많은 에러 로그 출력)
+=====================================================================
+/was/weblogic1036/domains/updomain/servers/uapsPortal/cache/EJBCompilerCache
+
+=====================================================================
+EJB jar 파일 웹로직 으로 컴파일
+=====================================================================
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.appc test.jar
+
+
+=====================================================================
+Weblogic 콘솔에서 서버 추가 및 배포에서 추가한 서버 물리기
+=====================================================================
+도메인 구조 - updomain - 환경 - 서버 (기존 uapsPortal) 복제해서 경로 부분만 바꿈
+배치 - 대상 서버를 uapsPortal2 추가해준다.
+
+
+=====================================================================
+ORACLE DB 계정 생성 후 권한 부여 및 테이블 생성
+=====================================================================
+SELECT * FROM USER_TABLES;
+SELECT * FROM ALL_TABLES WHERE OWNER = 'UPADM';
+SELECT * FROM UPADM.TB_USER_LIST;
+
+-- GRANT SELECT ANY TABLE, CREATE TABLE, RESOURCE TO UPADM2;
+-- REVOKE SELECT ANY TABLE, CREATE TABLE, RESOURCE FROM UPADM2;
+
+SET AUTOCOMMIT OFF;
+SET SERVEROUTPUT ON
+BEGIN
+    FOR C IN (SELECT * FROM ALL_TABLES WHERE OWNER = 'UPADM' AND TABLE_NAME LIKE 'TB_%') LOOP
+        IF C.TABLESPACE_NAME IS NULL THEN
+            DBMS_OUTPUT.PUT_LINE('CREATE TABLE '||C.TABLE_NAME||' TABLESPACE DATA01 AS (SELECT * FROM UPADM.'||C.TABLE_NAME||' WHERE ROWNUM < 10000)');
+            EXECUTE IMMEDIATE('CREATE TABLE '||C.TABLE_NAME||' TABLESPACE DATA01 AS (SELECT * FROM UPADM.'||C.TABLE_NAME||' WHERE ROWNUM < 10000)');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('CREATE TABLE '||C.TABLE_NAME||' TABLESPACE '||C.TABLESPACE_NAME||' AS (SELECT * FROM UPADM.'||C.TABLE_NAME||' WHERE ROWNUM < 10000)');
+            EXECUTE IMMEDIATE('CREATE TABLE '||C.TABLE_NAME||' TABLESPACE '||C.TABLESPACE_NAME||' AS (SELECT * FROM UPADM.'||C.TABLE_NAME||' WHERE ROWNUM < 10000)');
+        END IF;
+    END LOOP;
+END;
+/
+
+BEGIN
+    FOR C IN (SELECT * FROM USER_TABLES) LOOP
+        DBMS_OUTPUT.PUT_LINE(C.TABLE_NAME);
+        EXECUTE IMMEDIATE('DROP TABLE '||C.TABLE_NAME);
+    END LOOP;
+END;
+/
+
+
+================================
+class 리로드
+================================
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.Deployer -adminurl 192.168.1.205:7050 -user weblogic -password nate_zzang -name PORTAL -redeploy BpInteractionController.class
+java -cp /was/weblogic1036/wlserver_10.3/server/lib/weblogic.jar weblogic.Deployer -adminurl 192.168.1.205:7050 -user weblogic -password nate_zzang -name PORTAL -redeploy 
+
+================================================
+이중화로 분리해서 서버 구성시 설정 순서
+================================================
+1. Weblogic Console 에서 새로운 경로로 서버를 추가 및 로그 경로 확인
+2. 서버 실행/중지하는 스크립트 추가
+3. 서버 실행하는 스크립트에서 properties 파일들의 내용을 확인해서 경로 변경이 필요한 부분 확인.
+portal.properties (LDAP REAL 접속 정보를 최초에 여기서 읽음. 이 파일이 없으면, ldap.properties 정보를 확인하도록 코딩되어 있음)
+ldap.properties 혹시 모르니 이파일도 복사해서 구성시
+ldapdev.properties (LDAP DEV 접속 정보) 
+weblogic.xml 에서 workingDir 경로를 추가한 경로로 마춰줘야함. (기본 경로인데, 기존소스를 같이 쓸거면 변경 안하면 됨.)
+
+startM8031_J.sh 기동 스크립트에서 아래 부분 확인
+
+USER_MEM_ARGS="-DLDAPDEV=/was/upwas/WebApp/COMMON/conf/ldapdev2.properties"
+USER_MEM_ARGS="${USER_MEM_ARGS} -DPORTAL_CONF=/was/upwas/WebApp/PORTAL2/WEB-INF/conf/uaps_portal.properties"
+USER_MEM_ARGS="${USER_MEM_ARGS} -D${SERVER_NAME} -D${SERVER_PORT} -Xms512m -Xmx512m"
+USER_MEM_ARGS="${USER_MEM_ARGS} -XX:NewSize=128m -XX:MaxNewSize=128m -XX:SurvivorRatio=8"
+USER_MEM_ARGS="${USER_MEM_ARGS} -XX:PermSize=500m -XX:MaxPermSize=500m"
+USER_MEM_ARGS="${USER_MEM_ARGS} -verbosegc -Xloggc:${GC_LOG_DIR}/${SERVER_NAME}_gc.log"
+USER_MEM_ARGS="${USER_MEM_ARGS} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR}/${SERVER_NAME}_heapdump.log"
+USER_MEM_ARGS="${USER_MEM_ARGS} -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+USER_MEM_ARGS="${USER_MEM_ARGS} -DUPPROP=/was/upwas/WebApp/COMMON/conf/portal2.properties"
+USER_MEM_ARGS="${USER_MEM_ARGS} -Dlog4j.configuration=file:/was/upwas/WebApp/PORTAL2/WEB-INF/conf/log4j.properties"
+
+startManagedWebLogic8031.sh 기동 스크립트에서 아래 부분들 변경
+WEB Admin classes 부분 추가한 경로로 변경 (이부분 변경하지 않으면 PORTAL classes 를 그대로 사용한다는 의미. 필요시 유지)
+#####################################################################################################
+# WEB Admin classes
+#####################################################################################################
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/classes"
+
+Portal jar 부분 추가한 경로로 변경
+#####################################################################################################
+# Portal jar
+#####################################################################################################
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-dbcp.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-logging.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-fileupload.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-pool.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-io.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/ibatis-2.3.0.677.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/jstl.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/log4j-1.2.15.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/sitemesh-2.4.1.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/spring.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/standard.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/activation.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/jakarta-regexp-1.5.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/mail.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/quartz-all-1.6.5.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-httpclient-2.0.1.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/uaps-0.4.2.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/cds-simul-0.4.8.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/junit.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/jdom.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-beanutils-1.7.0.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-collections-3.1.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-lang-2.3.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/commons-logging-1.0.4.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/ezmorph-1.0.6.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/json-lib-2.2.3-jdk13.jar"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}/was/upwas/WebApp/PORTAL2/WEB-INF/lib/WideTNS_Message_V1.0.jar"
+
+#####################################################################################################
+# Config file 
+#####################################################################################################
+JAVA_OPTIONS="-DREGISTRY_FILE=/was/upwas/WebApp/COMMON/conf/uaps2.properties ${JAVA_OPTIONS}"
+JAVA_OPTIONS="-Dweblogic.http.isWLProxyHeadersAccessible=true ${JAVA_OPTIONS}"
+JAVA_OPTIONS="-DDBMAPPING=/was/upwas/WebApp/PORTAL2/WEB-INF/dbmapping ${JAVA_OPTIONS}"
+
+
+================================================================
+JSP 컴파일 옵션
+================================================================
+<jsp-descriptor>
+   <!-- true이면 기동시 jsp 파일 자동 컴파일 -->
+   <precompile>false</precompile>
+   <!-- true이면 기동시 jsp 컴파일 오류라도 계속 진행 -->
+   <precompile-continue>true</precompile-continue>
+</jsp-descriptor>
+
+
+#####################################################################################################
+# 아래는 에러수정내역
+#####################################################################################################
+
+================================================================
+아래와 같은 내용의 에러가 나오면 EBJ 를 확인. EBJ 추가하고 시작 안해서 그런거임.
+================================================================
+
+<Mar 13, 2018 4:59:13 PM KST> <Error> <HTTP> <BEA-101017> <[ServletContext@240273169[app:PORTAL module:PORTAL path: spec-version:null]] Root cause of ServletException.
+javax.naming.NameNotFoundException: Unable to resolve 'IFSSimulationHome'. Resolved ''; remaining name 'IFSSimulationHome'
+        at weblogic.jndi.internal.BasicNamingNode.newNameNotFoundException(BasicNamingNode.java:1139)
+        at weblogic.jndi.internal.BasicNamingNode.lookupHere(BasicNamingNode.java:252)
+        at weblogic.jndi.internal.ServerNamingNode.lookupHere(ServerNamingNode.java:182)
+        at weblogic.jndi.internal.BasicNamingNode.lookup(BasicNamingNode.java:206)
+        at weblogic.jndi.internal.WLEventContextImpl.lookup(WLEventContextImpl.java:254)
+        Truncated. see log file for complete stacktrace
+
+================================================================
+서버가 정상적으로 기동 되었는데, URL 접속시 에럭가 나는 경우. 로그에도 에러가 없는 경우가 있는데, 이거는 application 배포에 추가해 놓고 시작을 안해서 그럼
+================================================================
+
+================================================================
+JSP 를 새로 추가한 경우에는 application을 weblogic console 에서 갱신 해줘야함
+================================================================
+
+================================================================
+weblogic datasource 에서 암호 5회 잘못 입력시 account lock 이 발생 할 수 있음.
+weblogic domain name 클릭해서 보안쪽을 뒤지다 보면 account unlock 할 수 있음.
+아니면 sqlplus 로 해도 되고..
+================================================================
+
+================================================================
+log4j. properties 에서 sql 나오게 하는 문구
+================================================================
+log4j.debug=TRUE ( 이게 FALSE 이면 기동시 log4j.properties 정보를 읽고 있다는 내용의 로그가 나오지 않음)
+### mybatis loggers ###                                                                                                                                                     
+log4j.logger.com.ibatis=DEBUG, QUERy
+log4j.logger.com.ibatis.common.jdbc.SimpleDataSource=DEBUG, QUERY
+log4j.logger.com.ibatis.common.jdbc.ScriptRunner=DEBUG, QUERY
+log4j.logger.com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate=DEBUG, QUERY
+
+# sql loggers
+log4j.logger.java.sql.Connection=DEBUG, QUERY
+log4j.logger.java.sql.Statement=DEBUG, QUERY
+log4j.logger.java.sql.PreparedStatement=DEBUG, QUERY
+log4j.logger.java.sql.ResultSet=DEBUG, QUERY
+
+log4j.additivity.java.sql.PreparedStatement=false
+log4j.appender.QUERY=org.apache.log4j.DailyRollingFileAppender
+log4j.appender.QUERY.Threshold=DEBUG
+log4j.appender.QUERY.File=/logs/was/portal2/query.log
+log4j.appender.QUERY.ImmediateFlush=true
+log4j.appender.QUERY.Append=true
+log4j.appender.QUERY.DatePattern='.'yyyy-MM-dd
+log4j.appender.QUERY.layout=org.apache.log4j.PatternLayout
+log4j.appender.QUERY.layout.ConversionPattern=[%d] [%-5p] [%C] - %m%n

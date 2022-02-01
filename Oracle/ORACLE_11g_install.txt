@@ -1,0 +1,192 @@
+#==============
+# 이미지로 OS 설치시 반드시 swap 메모리 사이즈 확인 할것. 만들때 4G로 했더니 SWAP 도 4G 이상 요구되었음
+#==============
+
+#==============
+# Locale 변경
+#==============
+sed -i'' -e "s/UTF-8/eucKR/" /etc/sysconfig/i18n
+sed -i'' -e "\$a\export LANG=\"ko_KR.eucKR\"" /etc/profile
+
+#==============
+# host 등록
+#==============
+sed -i'' -e "\$a\192.168.1.204 uapdb" /etc/hosts
+
+#==============
+# Package Install
+#==============
+yum -y groupinstall "X Window System"  "GNOME Desktop Environment" "Desktop" "Fonts" "Korean Support"
+yum install -y binutils compat-libcap* gcc* glibc* ksh libgcc* libstdc* libaio* make* sysstat* unixODBC* elfutils-libelf-devel unzip wget
+
+wget ftp://ftp.pbone.net/mirror/www.whiteboxlinux.org/whitebox/4/en/os/x86_64/WhiteBox/RPMS/pdksh-5.2.14-30.x86_64.rpm
+rpm -Uvh --nodeps pdksh-5.2.14-30.x86_64.rpm
+
+rpm -Uvh glibc-2.3.4-2.43.el4_8.2.i686.rpm --nodeps --force
+
+groupadd oinstall
+groupadd dba
+groupadd oper
+
+useradd -m -d /home/oraUAP -g oinstall -G dba,oper -s /bin/bash oraUAP
+passwd oraUAP
+
+mkdir -p /ORACLE/product/11.2/uapdb
+chown -R oraUAP:oinstall /ORACLE
+chmod -R 777 /ORACLE
+
+unzip -q linux.x64_11gR2_database_1of2.zip
+unzip -q linux.x64_11gR2_database_2of2.zip
+
+
+
+==============
+swap 메모리 추가
+==============
+free -m
+dd if=/dev/zero of=/home/swapfile bs=1024 count=4000000
+mkswap /home/swapfile
+swapon /home/swapfile
+ vi /etc/rc.d/rc.local
+ swapon /home/swapfile
+ free -m
+ 
+=================
+kernel Parameter 설정
+=================
+vi /etc/sysctl.conf
+
+kernel.sem = 250 32000 100 128
+fs.file-max = 6815744
+net.ipv4.ip_local_port_range = 9000 65500
+net.core.rmem_default = 262144
+net.core.rmem_max = 4194304
+net.core.wmem_default = 262144
+net.core.wmem_max = 1048586
+fs.aio-max-nr = 1048576
+
+sysctl -p
+
+================= 
+사용자 자원 제한 설정 
+=================
+vi /etc/security/limits.conf
+# Parameter for SKT
+*               soft    nofile          8192
+*               hard    nofile          65536
+*               soft    nproc           8192
+*               hard    nproc           16384
+*               soft    core            20480
+
+
+=======================
+INSTALL RESPONSE 파일 수정
+=======================
+cd /ORACLE/database/response/
+cp db_install.rsp uapdb_install.rsp
+vi uapdb_install.rsp
+oracle.install.option=INSTALL_DB_SWONLY
+UNIX_GROUP_NAME=oinstall
+INVENTORY_LOCATION=/ORACLE/oraInventory
+SELECTED_LANGUAGES=en,ko
+ORACLE_HOME=/ORACLE/product/11.2/uapdb
+ORACLE_BASE=/ORACLE
+oracle.install.db.InstallEdition=EE
+oracle.install.db.DBA_GROUP=dba
+oracle.install.db.OPER_GROUP=oper
+DECLINE_SECURITY_UPDATES=true
+
+
+=====================
+Installer silent mode 설치
+=====================
+/ORACLE/database/runInstaller -silent -executePrereqs -responseFile /ORACLE/database/response/uapdb_install.rsp
+/ORACLE/database/runInstaller -silent -responseFile /ORACLE/database/response/uapdb_install.rsp
+
+/ORACLE/oraInventory/orainstRoot.sh
+/ORACLE/product/11.2/uapdb/root.sh
+
+=====================
+Listner silent mode 설치
+=====================
+수정내용 없이 그대로 사용
+netca -silent -responseFile /ORACLE/database/response/uapdb_netca.rsp
+netca /silent /responseFile /ORACLE/database/response/uapdb_netca.rsp
+lsnrctl status
+
+===========================
+~/.bash_profile 
+===========================
+export ORACLE_BASE=/ORACLE
+export ORACLE_HOME=$ORACLE_BASE/product/11.2/uapdb
+export ORACLE_SID=uapdb
+export ORACLE_TERM=xterm
+export PATH=/usr/sbin:$PATH
+export PATH=$PATH:$ORACLE_HOME/bin
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib:/usr/local/lib
+export CLASSPATH=$ORACLE_HOME/JRE:$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+export NLS_LANG=KOREAN_KOREA.KO16MSWIN949
+
+=====================
+Database silent mode 설치
+=====================
+GDBNAME = "uapdb"
+SID = "uapdb"
+CHARACTERSET = "KO16MSWIN949"
+SYSPASSWORD="password"
+SYSTEMPASSWORD="password"
+dbca -silent -responseFile /ORACLE/database/response/uapdb_dbca.rsp
+dbca -silent -responseFile /ORACLE/database/response/guapdb_dbca.rsp
+
+sqlplus / as sysdba
+
+CREATE TABLESPACE DATA01 DATAFILE '/ORACLE/oradata/uapdb/data01.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE DATA02 DATAFILE '/ORACLE/oradata/uapdb/data02.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE DATA03 DATAFILE '/ORACLE/oradata/uapdb/data03.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE DATA04 DATAFILE '/ORACLE/oradata/uapdb/data04.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+
+CREATE TABLESPACE INDEX01 DATAFILE '/ORACLE/oradata/uapdb/index01.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE INDEX02 DATAFILE '/ORACLE/oradata/uapdb/index02.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE INDEX03 DATAFILE '/ORACLE/oradata/uapdb/index03.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE INDEX04 DATAFILE '/ORACLE/oradata/uapdb/index04.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+
+CREATE TABLESPACE TS_MWADM DATAFILE '/ORACLE/oradata/uapdb/ts_mwadm.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE BIG_IDX DATAFILE '/ORACLE/oradata/uapdb/big_idx.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+CREATE TABLESPACE BIG_DATA DATAFILE '/ORACLE/oradata/uapdb/big_data.dbf' SIZE 64M AUTOEXTEND ON SEGMENT SPACE MANAGEMENT AUTO;
+
+DROP USER VAM;
+DROP USER MIG;
+DROP USER PMH;
+DROP USER UAPIS;
+DROP USER UPADM;
+DROP USER UAPIFS;
+
+CREATE USER VAM IDENTIFIED BY oracle08 DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+CREATE USER MIG IDENTIFIED BY oracle08 DEFAULT TABLESPACE BIG_DATA QUOTA UNLIMITED ON BIG_DATA;
+CREATE USER PMH IDENTIFIED BY oracle08 DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+CREATE USER UAPIS IDENTIFIED BY oracle08 DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+CREATE USER UPADM IDENTIFIED BY oracle08 DEFAULT TABLESPACE DATA01 QUOTA UNLIMITED ON DATA01;
+CREATE USER UAPIFS IDENTIFIED BY oracle08 DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+
+CREATE ROLE CONNECT2;
+GRANT CREATE VIEW, ALTER SESSION, CREATE SYNONYM, CREATE DATABASE LINK TO CONNECT2;
+
+GRANT CONNECT, CONNECT2, RESOURCE TO VAM;
+GRANT CONNECT, CONNECT2, RESOURCE TO MIG;
+GRANT CONNECT, CONNECT2, RESOURCE TO PMH;
+GRANT CONNECT, CONNECT2, RESOURCE TO UAPIS;
+GRANT CONNECT, CONNECT2, RESOURCE TO UAPIFS;
+GRANT CONNECT, CONNECT2, RESOURCE, DBA TO UPADM;
+
+cd /ORACLE/oradata
+impdp system/password@uapdb full=Y directory=DUMP_DIR dumpfile=UAPDB.dmp logfile=impdpUAPDB.log
+===============
+expdp impdp 이슈
+===============
+export 할때 DBMS_METADATA.GET_DDL 가 실행 불가능한 syntax 를 생성해서 object 들이 제대로 안만들어짐
+아래는 관련 내용
+When performing an Oracle database export with the expdp of Oracle 11gR2 (11.2.0.1) and then importing it into the database with impdp, the following error messages appear in the import log file:
+ORA-39083: Object type INDEX failed to create with error:
+ORA-14102: only one LOGGING or NOLOGGING clause may be specified
+This is a known Oracle 11gR2 issue. The problem is that the DBMS_METADATA.GET_DDL returns invalid syntax for an index created. So, during the index creation, both the NOLOGGING and LOGGING keywords are visible in the DDL. Download and apply Patch 8795792 from Oracle to resolve this issue.
+

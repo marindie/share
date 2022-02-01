@@ -1,0 +1,78 @@
+--===========================
+-- INSERT 문생성 (테이블에 따라 조건 부여)
+--===========================
+SET SERVEROUTPUT ON 
+SET ECHO OFF
+SET LINESIZE 30000
+SET TRIMOUT ON
+SET TRIMSPOOL ON
+SET HEADING OFF
+SET FEEDBACK OFF
+SET PAGESIZE 0
+SET TERM OFF
+set long 2000000000
+column res Format a20000
+ALTER SESSION SET NLS_DATE_FORMAT = 'YY-MM-DD';
+DECLARE
+    TOTAL NUMBER;
+    LINE NUMBER;
+    CNT NUMBER;
+    LEN NUMBER;
+    CUR_TB VARCHAR2(2000);
+    SQL_TEXT VARCHAR2 (20000);
+BEGIN
+    dbms_output.enable(NULL);
+    CUR_TB := 'DD';
+    CNT := 0;
+    LINE := 0;
+    LEN := 0;
+    SELECT COUNT(1) INTO TOTAL FROM USER_TAB_COLUMNS;
+    FOR C IN (SELECT * FROM USER_TAB_COLUMNS WHERE TABLE_NAME NOT LIKE '%BK%' AND TABLE_NAME NOT LIKE '%BAK%' AND TABLE_NAME NOT LIKE '%_TEMP' AND TABLE_NAME NOT LIKE '%HIST%' AND TABLE_NAME NOT IN ('XTOOL_PLAN_TABLE','STATS_20140211','STATS_20141113','STATS_20141114','TB_VAM_SEND_DATA_20180613','TB_CP_SERVICE_INFO','TB_JOB_STATISTIC','TB_MULTI_NUM','TB_QNA','TB_CP_PROFILE_MASTER_20170531','TB_CP_PROFILE_MASTER_20170602') ORDER BY TABLE_NAME, COLUMN_ID) LOOP
+        LINE := LINE + 1;
+        IF ( CUR_TB != C.TABLE_NAME ) THEN
+            IF (CNT != 0) THEN
+                SQL_TEXT := SUBSTR(SQL_TEXT, 1, LENGTH(SQL_TEXT) - 1);
+                IF (CUR_TB = 'TB_UAP_ATTR_LIST' OR CUR_TB = 'TB_UAP_CHANGE' OR CUR_TB = 'TB_UAP_DEVICE_HIST_LOG' OR CUR_TB = 'TB_UAP_VAM_BUF_HIST' OR CUR_TB = 'TB_USER_LIST' OR CUR_TB = 'TB_ACL_INFO') THEN
+                    SQL_TEXT := SQL_TEXT||');'' as res FROM '||CUR_TB||';';
+                ELSE
+                    SQL_TEXT := SQL_TEXT||');'' as res FROM '||CUR_TB||' WHERE ROWNUM < 10000;';
+                END IF;
+                DBMS_OUTPUT.PUT_LINE(SQL_TEXT);
+                DBMS_OUTPUT.PUT_LINE('SPOOL OFF');
+            END IF;
+            CNT := CNT + 1;
+            CUR_TB := C.TABLE_NAME;
+            DBMS_OUTPUT.PUT_LINE('SPOOL '||C.TABLE_NAME||'.SQL');
+            SQL_TEXT := 'SELECT ''INSERT INTO '||C.TABLE_NAME||' VALUES(';
+            IF ( C.DATA_TYPE = 'DATE') THEN 
+                SQL_TEXT := SQL_TEXT||'''||NVL2('||C.COLUMN_NAME||',''TO_DATE(''''''||'||C.COLUMN_NAME||'||'''''',''''YY-MM-DD'''')'',''null'')||'',';
+            ELSIF ( C.DATA_TYPE = 'CLOB') THEN 
+                SQL_TEXT := SQL_TEXT||'''||CASE WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 2000 THEN ''''''''||REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')||'''''''' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 4000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')'' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 6000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),4001,2000)||'''''')'' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 8000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),4001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),6001,2000)||'''''')'' END||'',';
+            ELSE
+                SQL_TEXT := SQL_TEXT||'''''''||REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')||'''''',';
+            END IF;            
+        ELSE
+            IF (LINE = TOTAL) THEN
+                SQL_TEXT := SUBSTR(SQL_TEXT, 1, LENGTH(SQL_TEXT) - 1);
+                SQL_TEXT := SQL_TEXT||');'' as res FROM '||CUR_TB||' WHERE ROWNUM < 10000;';
+                DBMS_OUTPUT.PUT_LINE(SQL_TEXT);
+                DBMS_OUTPUT.PUT_LINE('SPOOL OFF');
+            END IF;
+            IF ( C.DATA_TYPE = 'DATE') THEN 
+                SQL_TEXT := SQL_TEXT||'''||NVL2('||C.COLUMN_NAME||',''TO_DATE(''''''||'||C.COLUMN_NAME||'||'''''',''''YY-MM-DD'''')'',''null'')||'',';
+            ELSIF ( C.DATA_TYPE = 'CLOB') THEN 
+                SQL_TEXT := SQL_TEXT||'''||CASE WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 2000 THEN ''''''''||REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')||'''''''' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 4000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')'' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 6000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),4001,2000)||'''''')'' WHEN LENGTH(REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')) < 8000 THEN ''TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),1,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),2001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),4001,2000)||'''''')||TO_CLOB(''''''||SUBSTR(REPLACE(REPLACE(REPLACE(XML_DATA,CHR(13),''''),CHR(10),'' ''),CHR(39),''''),6001,2000)||'''''')'' END||'',';
+            ELSE
+                SQL_TEXT := SQL_TEXT||'''''''||REPLACE(REPLACE(REPLACE('||C.COLUMN_NAME||',CHR(13),''''),CHR(10),'' ''),CHR(39),'''')||'''''',';
+            END IF;
+        END IF;
+    END LOOP;
+END;
+/
+
+--======================================================
+-- 작업 테이블에 FK 로 걸려있는 테이블이 존재하는지 확인
+--======================================================
+select * from user_constraints where constraint_type = 'R' and R_CONSTRAINT_NAME 
+IN (SELECT CONSTRAINT_NAME FROM user_constraints 
+where table_name in ('TB_UAP_CHANGE','TB_CP_SERVICE_INFO','TB_UAP_ATTR_LIST','TB_UAP_CHANGE','TB_UAP_DEVICE_HIST_LOG') and CONSTRAINT_TYPE = 'P');

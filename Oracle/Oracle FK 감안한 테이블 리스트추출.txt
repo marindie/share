@@ -1,0 +1,94 @@
+--===============================================================
+-- 테이블 생성시 FK 때문에 먼저 만들어야 하는 테이블 리스트
+--===============================================================
+SET SERVEROUTPUT ON
+DECLARE
+    TYPE ARRAY_1 IS VARRAY(1000) OF VARCHAR2(100);
+    V_ARR1 ARRAY_1 := ARRAY_1();
+    V_ARR2 ARRAY_1 := ARRAY_1();
+    V_FOUND VARCHAR2(1) := 'N';
+BEGIN
+    SELECT TABLE_NAME BULK COLLECT INTO V_ARR2 FROM USER_TABLES ORDER BY 1;
+
+    SELECT DISTINCT A.TABLE_NAME 
+    BULK COLLECT INTO V_ARR1
+    FROM USER_CONSTRAINTS A,
+    (SELECT CONSTRAINT_NAME, R_CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME IN (SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'R')) B,
+    USER_IND_COLUMNS C
+    WHERE A.CONSTRAINT_NAME = B.R_CONSTRAINT_NAME
+    AND A.TABLE_NAME = C.TABLE_NAME;
+    IF V_ARR1.COUNT > 0 THEN
+        FOR C IN V_ARR1.FIRST .. V_ARR1.LAST LOOP
+            DBMS_OUTPUT.PUT(V_ARR1(C)||', ');
+        END LOOP;
+    END IF;        
+    
+    IF V_ARR2.COUNT > 0 THEN
+        FOR C IN V_ARR2.FIRST .. V_ARR2.LAST LOOP
+            V_FOUND := 'N';
+            IF V_ARR1.COUNT > 0 THEN
+                FOR D IN V_ARR1.FIRST .. V_ARR1.LAST LOOP
+                    IF( V_ARR1(D) = V_ARR2(C) ) THEN
+                        V_FOUND := 'Y';
+                        EXIT;
+                    END IF;
+                END LOOP;
+            END IF;
+            IF ( V_FOUND = 'N' ) THEN
+                DBMS_OUTPUT.PUT(V_ARR2(C)||', ');
+            END IF;            
+        END LOOP;
+    END IF;
+    DBMS_OUTPUT.PUT_LINE('');
+END;
+/
+
+
+--==============================================================================================================================
+-- 테이블 INSERT 시 FK 의 부모 PK 에러를 방지하기 위해 먼저 넣어야하는 부모테이블 LIST
+--==============================================================================================================================
+SET SERVEROUTPUT ON
+DECLARE
+    TYPE ARRAY_1 IS VARRAY(1000) OF VARCHAR2(100);
+    V_ARR1 ARRAY_1 := ARRAY_1();
+    V_ARR2 ARRAY_1 := ARRAY_1();    
+    V_FOUND VARCHAR2(1) := 'N';
+BEGIN
+    SELECT TABLE_NAME BULK COLLECT INTO V_ARR2 FROM USER_TABLES ORDER BY 1;
+
+	SELECT TABLE_NAME 
+    BULK COLLECT INTO V_ARR1
+    FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME 
+		IN( SELECT R_CONSTRAINT_NAME 
+		    FROM USER_CONSTRAINTS 
+			WHERE CONSTRAINT_NAME 
+			    IN (SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE CONSTRAINT_TYPE = 'R')
+		  );
+	
+    IF V_ARR1.COUNT > 0 THEN
+        FOR C IN V_ARR1.FIRST .. V_ARR1.LAST LOOP
+            DBMS_OUTPUT.PUT(V_ARR1(C)||', ');
+        END LOOP;
+    END IF;        
+    
+--    IF V_ARR2.COUNT > 0 THEN
+--        FOR C IN V_ARR2.FIRST .. V_ARR2.LAST LOOP
+--            V_FOUND := 'N';
+--            IF V_ARR1.COUNT > 0 THEN
+--                FOR D IN V_ARR1.FIRST .. V_ARR1.LAST LOOP
+--                    IF( V_ARR1(D) = V_ARR2(C) ) THEN
+--                        V_FOUND := 'Y';
+--                        EXIT;
+--                    END IF;
+--                END LOOP;
+--            END IF;
+--            IF ( V_FOUND = 'N' ) THEN
+--                DBMS_OUTPUT.PUT(V_ARR2(C)||', ');
+--            END IF;            
+--        END LOOP;
+--    END IF;
+    DBMS_OUTPUT.PUT_LINE('');
+END;
+/
+-- 상용에서 INSERT 시 먼저 넣어야 하는 테이블 목록
+TB_REQ_JOB, TB_USER_GRP, TB_MENU_ACCESS_AUTH, TB_SERVICE_BUF, TB_SERVICE_LIST, TB_CP_PROFILE, TB_CUST_PROF, TB_ADLT_AUTH_BUF, TB_IF_BUF,

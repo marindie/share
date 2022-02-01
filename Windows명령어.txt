@@ -1,0 +1,14 @@
+
+=================
+해당 샘플은 oracle sql 로더형태로 디비를 추출했응 경우에 해당 컨트롤러 파일들을 폴더에 넣어놓고 일괄 시행시키는 명령어
+=================
+for /r . %%g in (*.ctl) do 
+(
+     sqlldr tbpt/tbpt1234@orcl control=%%g
+)
+
+=================
+Fine All Listening Port
+=================
+netstat -aon | find /i "listening"
+taskkill /F /PID 189
