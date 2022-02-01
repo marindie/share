@@ -84,3 +84,9 @@ BEGIN
 	EXECUTE IMMEDIATE 'PURGE RECYCLEBIN';
 END;
 /
+
+
+--==================================================
+-- DROP PURGE 안한 상태의 TABLE 들 원복 명령어
+--==================================================
+FLASHBACK TABLE 테이블명 TO BEFORE DROP
