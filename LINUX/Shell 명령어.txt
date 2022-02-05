@@ -1,0 +1,6 @@
+# 명령어 결과를 변수에 저장
+variable_name=$(command)
+variable_name=$(command [option ...] arg1 arg2 ...)
+OR
+variable_name=`command`
+variable_name=`command [option ...] arg1 arg2 ...`

@@ -1,0 +1,14 @@
+#======================
+# 사용자 관련
+#======================
+# 그룹추가
+usermod -a -G examplegroup exampleusername
+
+# Java 설치 경로 확인
+update-alternatives --list java
+/usr/lib/jvm/java-11-openjdk-amd64/bin/java
+/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+
+whereis java
+ls -l /usr/bin/java
+ls -l /etc/alternatives/java

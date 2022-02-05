@@ -1,0 +1,4 @@
+--============================
+-- 날짜 포맷 변경 (session  단위)
+--============================
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';

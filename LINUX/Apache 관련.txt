@@ -1,0 +1,29 @@
+== svn 설치 및 웹 환경 설치(아파치)
+sudo apt install apache2 apache2-utils
+sudo apt install subversion libapache2-mod-svn subversion-tools libsvn-dev
+
+== 아파치 기동
+sudo systemctl start apache2.service
+sudo systemctl enable apache2.service
+
+== Apache2 modules run SVN to function
+a2enmod dav
+a2enmod dav_svn
+
+
+== VirtualHost 작성
+sudo cp 000-default.conf icnexa.conf
+sudo vi /etc/apache2/sites-available/icnexa.conf
+
+<VirtualHost *:80>
+	ServerName icnexa.com
+
+	ServerAdmin icnexa@localhost
+	DocumentRoot /var/www/html/icnexa
+	<Directory /var/www/html/icnexa>
+		AllowOverride All
+        	Require all granted
+	</Directory>
+</VirtualHost>
+
+sudo a2ensite icnexa.conf
