@@ -78,3 +78,96 @@ mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file -Dfile=<pat
     <scope>system</scope>
     <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/파일명.jar</systemPath>
 </dependency>
+
+
+
+=======================
+POM.xml 
+=======================
+Maven Profile 별 배포 관리
+Spring Profile 을 추천하기는 하지만 logback.xml 관련 파일로 삽질을 좀 했음.
+
+방법 1.
+- resources attribute 를 사용해서 logback.xml 파일을 overwrite 하는 방법
+- 아래의 옵션으로 overwrite 활성화. 기본 false
+<properties>
+    <maven.resources.overwrite>false</maven.resources.overwrite>
+</properties>
+
+- 먼저 src/main/resources 파일을 가져오도록 하고
+- 이후에 src/main/${env} Ex) src/main/dev 에 있는 추가 설정 파일. logback.xml 을 가져오도록 하는데
+- 같은 파일이 있으면 overwrite 됨
+<resources>
+    <resource>
+        <directory>src/main/resources</directory>
+    </resource>
+    <resource>
+        <directory>src/main/${env}</directory>
+        <includes>
+            <include>logback.xml</include>
+        </includes>
+    </resource>
+</resources>	
+
+- 아래는 내가 사용하는 Profile
+<!-- 배포용 설정파일 구분  -->
+	<profiles>
+		<!-- Local server -->
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<env>local</env>
+			</properties>
+		</profile>
+		<!-- Development server -->
+		<profile>
+			<id>dev</id>
+			<properties>
+				<env>dev</env>
+			</properties>
+			  <build>
+				<resources>
+	               	<resource>
+	                       <directory>src/main/resources</directory>
+	                   </resource>
+	                   <resource>
+	                       <directory>src/main/${env}</directory>
+	                       <includes>
+	                       	<include>logback.xml</include>
+	                       </includes>
+	                   </resource>
+	               </resources>			  
+			  	<plugins>
+			  		<plugin>
+			  			<artifactId>maven-antrun-plugin</artifactId>
+				        <version>3.0.0</version>
+				        <executions>
+				          <execution>
+				            <phase>compile</phase>
+				            <configuration>
+				              <target>
+			                   <ant antfile="${basedir}/src/main/dev/build.xml">
+                 				<target name="copy"/>
+               				   </ant>
+				              </target>	                        
+				            </configuration>
+				            <goals>
+				              <goal>run</goal>
+				            </goals>
+				          </execution>
+				        </executions>
+			  		</plugin>
+			  	</plugins>
+			</build>			
+		</profile>
+		<!-- real server -->
+		<profile>
+			<id>prd</id>
+			<properties>
+				<env>prd</env>
+			</properties>
+		</profile>
+	</profiles>	
