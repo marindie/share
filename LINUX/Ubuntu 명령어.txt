@@ -12,3 +12,12 @@ update-alternatives --list java
 whereis java
 ls -l /usr/bin/java
 ls -l /etc/alternatives/java
+
+#쓰기 권한 관련. g+s 가 뭔지 궁금함
+This command sets the "set group ID" (setgid) mode bit on the current directory, written as ..
+This means that all new files and subdirectories created within the current directory inherit the group ID of the directory, 
+rather than the primary group ID of the user who created the file. 
+This will also be passed on to new subdirectories created in the current directory.
+g+s affects the files' group ID but does not affect the owner ID.
+sudo chown -R root:www-data /var/www/
+sudo chmod -R g+s /var/www/
