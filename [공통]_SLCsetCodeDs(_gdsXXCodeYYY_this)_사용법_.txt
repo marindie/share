@@ -1,0 +1,27 @@
+h1. [공통] SLCsetCodeDs("gdsXXCodeYYY"this) 사용법 
+
+* SLC.setCodeDs 를 사용하여 Combo 컴포넌트 또는 Grid 안의 displaytype combotext 사용 할 수 있습니다.
+* 그리드의 경우 3번째 파라미터는 필요 없고
+* Combo 컴포넌트의 경우 3번째 파라미터에 사용중인 Combo ID 를 넣어주면 됩니다.
+
+<pre><code class="javascript">
+// 그리드에 있는 combotext display type 사용 방법
+	SLC.setCodeDs("gdsCPCode003",this);  //신청구분
+	SLC.setCodeDs("gdsCSCode014",this);  //협의대상
+	SLC.setCodeDs("gdsCSCode012",this);  //처리상태(반입여부처리상태?)
+	SLC.setCodeDs("gdsCSCode031",this);  //폐기물성상
+	SLC.setCodeDs("gdsCSCode015",this);  //협의단위
+	SLC.setCodeDs("gdsCSCode058",this);  //처리상태(반입개시처리상태?)
+	SLC.setCodeDs("gdsCSCode059",this);  //처리상태(첫차처리상태?)
+
+//Combo 컴포넌트에 바인딩 하는 샘플
+var divDet = this.divDet.form.divCont.form;
+	SLC.setCodeDs('gdsCSCode031',this, divDet.cmbWstAtbCd);  //협의단위
+	SLC.setCodeDs('gdsCMCode091',this, divDet.cmbSdSts);  
+	SLC.setCodeDs('gdsCSCode015',this, divDet.cmbRqtUtCd);
+</code></pre>
+
+h1. 동작이 안할때 체크해볼만한 사항
+
+* codecolumn 과 datacolumn 의 값이 Upper Case 로 된 경우
+** Ex) CmnCd => cmnCd , CmnCdNm => cmnCdNm 

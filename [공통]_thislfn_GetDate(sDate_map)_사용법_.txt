@@ -1,0 +1,56 @@
+h1. [공통] this.lfn GetDate(sDate map) 사용법 
+
+<pre><code class="javascript">
+//주로 과거의 날짜로 세팅을 하기에 과거일로 계산해주는 기능 추가
+
+//오늘날짜 가져오는 방법
+this.lfn_GetDate("yyyyMMdd");
+//오늘로 부터 2년전
+this.lfn_GetDate("yyyyMMdd",{"custom" : "year 2"});
+//오늘로 부터 2개월전
+this.lfn_GetDate("yyyyMMdd",{"custom" : "month 2"});
+//오늘로 부터 2일전
+this.lfn_GetDate("yyyyMMdd",{"custom" : "day 2"});
+//오늘날짜 년월만 추출
+this.lfn_GetDate("yyyyMM");
+//이번달 1일 
+this.lfn_GetDate("yyyyMM")+"01"; //this.lfn_GetFirstDay(sDateYm) 가 있는데, 잘 동작하는지도 모르고, 불필요해보임. 사용하지 말것.
+//this.lfn_GetLastDay(sDateYm) 은 해당 월의 마지막일자를 가져옴. 참고.
+
+//올해 연도만
+this.lfn_GetDate("yyyy");
+
+//포맷 관련
+switch(sDate)
+    {
+        case "yyyy" :
+            sRtnDate = "" +year;
+            break;
+        case "yyyyMM" :
+            sRtnDate = "" +year + month;
+            break;
+        case "yyyyMMdd" :
+            sRtnDate = "" + year + month + day;
+            break;
+        case "yyyyMMddhhmmss" :
+            sRtnDate = "" +year + month + day + 
+                       hour + minute + second;
+            break;
+        case "MM" :
+            sRtnDate = month;
+            break;
+        case "hh" :
+            sRtnDate = hour;
+            break;
+        case "mm" :
+            sRtnDate = minute;
+            break;
+        case "ss" :
+            sRtnDate = second;
+            break;
+        case "hhmmss" :
+            sRtnDate = "" +hour + minute + second;
+            break;
+        default : //do nothing
+    }
+</code></pre>

@@ -1,0 +1,82 @@
+h1. [공통] 팝업 종료후 부모창 함수 호출 및 파라미터 전달 방법 
+
+* 부모창에서 선언하는 방법. 중요한 부분은 sCallback 에 String 으로 팝업창 종료시 호출할 함수명을 입력.
+
+<pre><code class="javascript">
+this.fn_Update = function(){
+	var ds = this.lfn_CreateSelectedDataset(this.dsTncmcc001,this.dsTncmcc001.rowposition);
+	
+	var param ={
+		dsTncmcc041 : ds
+		, sCallback : "fn_popupCallback"
+	};
+	this.lfn_Dialog(obj.id, "CC::ICCC0006_P2.xfdl", param);	
+}
+
+this.fn_popupCallback = function(map){
+	if(map.svcId == "btnPopSrchAr"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "btnPopSrchDbet"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "btnPopSrchWst"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "btnPopSrchManfAr"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "btnPopSrchManfDbet"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "btnPopSrchManfWst"){
+		this.lfn_GetSelectedDataset(this.dsParams, map.ds, map.idx);
+	}else if(map.svcId == "grdList1"){
+		trace('good');
+	}
+}
+
+</code></pre>
+
+
+* 팝업창에서 호출 하는 방법
+
+<pre><code class="javascript">
+this.F_sCallback = "";
+
+this.ICCC0006_P2_onload = function(obj:nexacro.Form,e:nexacro.LoadEventInfo){
+...
+    //this를 빼고 assign 하면 선언부 외의 함수에서 this를 빼고 사용하면 동작
+    //this를 붙여서 assign 하면 사용시에도 this를 붙여서 사용해야 하는게 일반적임. 아닌 경우도 있을 수 있음.
+    F_sCallback = this.parent.sCallback;
+
+}
+
+
+//닫기 버튼 클릭시 호출
+this.btnClose_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var map = { "svcId" : "grdList1" };
+	this.opener[F_sCallback](map);
+	this.close();
+};
+
+</code></pre>
+
+h1. 콜백 함수를 String 변수가 아닌 방식으로 사용하는 방법
+
+* 부모창 화면 소스에 fn_popupCallback 함수 작성
+<pre><code class="javascript">
+//닫기 버튼 클릭시 호출
+this.fn_popupCallback = function(map)
+{
+	trace(map.svcId);
+	this.fn_search();
+};
+</code></pre>
+
+<pre><code class="javascript">
+//닫기 버튼 클릭시 호출
+this.btnClose_onclick = function(obj:nexacro.Button,e:nexacro.ClickEventInfo)
+{
+	var map = { "svcId" : "grdList1" };
+	this.opener.fn_popupCallback(map);
+	this.close();
+};
+</code></pre>
+

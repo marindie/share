@@ -1,0 +1,35 @@
+====================
+apache 포트 변경
+====================
+CentOS/Fedora
+sudo /vi /etc/httpd/conf/httpd.conf
+Ubuntu/Debian
+sudo vi /etc/apache2/ports.conf
+
+Listen 80 => Listen 8088
+
+cd /etc/apache2/sites-available
+sudo vi /etc/apache2/sites-enabled/000-default.conf
+<VirtualHost: *:80>
+===>> <VirtualHost: *:8088>
+
+<VirtualHost *:8088>
+	ServerName icnexa.com
+	ServerAdmin webmaster@localhost
+	DocumentRoot /var/www/html/icnexa
+	<Directory /var/www/html/icnexa>
+		Options ALL
+		Allowoverride ALL
+		Require all granted
+		RewriteEngine on
+		RewriteCond %{REQUEST_URI} ^(.*)\.(html|htm|php)$
+		RewriteRule "." "/var/www/html/icnexa/index.html"
+	</Directory>
+</VirtualHost>
+
+sudo a2ensite icnexa.conf
+sudo apache2ctl configtest
+sudo systemctl restart apache2
+
+
+@CrossOrigin(origins="*",allowedHeaders="*")

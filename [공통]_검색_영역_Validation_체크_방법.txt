@@ -1,0 +1,45 @@
+h1. [공통] 검색 영역 Validation 체크 방법
+
+* this.lfn_CheckValidation 호출시 검색 영역의 div 를 파라미터로 넘겨주셔야 합니다.
+
+<pre><code class="javascript">
+this.form_OnLoadCompleted = function(obj:nexacro.Form, e:nexacro.LoadEventInfo)
+{		
+...
+	this.fn_setEssential();							//필수값 세팅
+...
+}
+
+this.fn_setEssential = function(){
+	this.lfn_setEssential(this.divHead.form.divDssRqtDe.form.calFrom,"마감일자(From)");
+	this.lfn_setEssential(this.divHead.form.divDssRqtDe.form.calTo,"마감일자(To)");
+	this.lfn_setEssential(this.divHead.form.edtSrchManfArCd,"인계서관할지역");
+	this.lfn_setEssential(this.divHead.form.edtSrchManfDbetCd,"인계서배출처");
+	this.lfn_setEssential(this.divHead.form.edtSrchManfWstCd,"인계서폐기물");
+	this.lfn_setEssential(this.divHead.form.edtSrchArCd,"지역");
+	this.lfn_setEssential(this.divHead.form.edtSrchDbetCd,"배출업소");
+	this.lfn_setEssential(this.divHead.form.edtSrchWstCd,"폐기물");
+}
+
+	//1.필수입력 체크
+	if(this.lfn_CheckValidation(this.divHead)) {	
+		this.lfn_Transaction	(
+			"selectList"									//tranCallBack ID
+		,	"cc0006/selectList.nx"							//Service Name
+		,	"dsParams=dsKeySrch"							//Input Data
+		,	"dsTncmcc001=dsTncmcc001"						//Output Data
+		,	""												//Input Parameters
+		,	"fn_TranCallBack"								//tranCallBack Function Name
+		,	true											//ProgressBar Active Y/N
+			);
+	}
+</code></pre>
+
+* this.gfnIsNull(comp); 사용하여 개별 처리를 하여도 무방합니다.
+
+h1. 제약사항
+
+* Edit, Calendar 만 처리. Date Format 체크는 검토 후 추가 예정.
+* 콤보 박스 및 체크 박스는 화면 업무에 마춰서 별도 처리
+
+

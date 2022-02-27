@@ -1,0 +1,161 @@
+h1. Edit 박스에 코드 연결 하는 방법
+
+* 코드ID 정보
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfArCd,"manfArCd"); //인계서관할지역
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfDbetCd,"manfDbetCd");//인계서배출처
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfWstCd,"manfWstCd");//인계서폐기물
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchArCd,"arCd");//지역
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchDbetCd,"dbetCd");//배출업소
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"wstCd");//폐기물
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"tcpyCd");//운반업체
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd, "postNo");//주소
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd, "empList");//적발자
+** this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd, "vhcList");//차량번호
+
+* 예시)
+this.fn_InitKeySearchEdit = function(){
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfArCd,"manfArCd"); //인계서관할지역
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfDbetCd,"manfDbetCd");//인계서배출처
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchManfWstCd,"manfWstCd");//인계서폐기물
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchArCd,"arCd");//지역
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchDbetCd,"dbetCd");//배출업소
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"wstCd");//폐기물
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"postNo");//주소
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"empList");//적발자
+	this.lfn_setKeywordSearchEdit(this,this.divHead.form.edtSrchWstCd,"vhcList", { "displayType" : "code" });//차량번호
+}
+
+* Dataset 과 Edit 박스를 Bind 하지 않은 상태로 적용 후, 정상 동작시 Bind 하여 다시 테스트 해보는 방법을 추천!!!
+* 화면에 뿌려지는 Text 와 검색에 필요한 Text 가 달라서 dsKeySrch 를 내부적으로 사용
+<pre><code class="javascript">
+this.fn_SelectTran = function(map)
+{
+	var dtFrom = this.divHead.form.divDssRqtDe.form.calFrom.value;
+	var dtTo = this.divHead.form.divDssRqtDe.form.calTo.value;
+	
+	this.dsParams.setColumn(0,'dssRqtDeFrom',dtFrom);
+	this.dsParams.setColumn(0,'dssRqtDeTo',dtTo);
+
+	SLC.newDs(this,[],"dsKeySrch");
+	this.dsKeySrch.copyData(this.dsParams);
+	this.lfn_getKeySrchGridValue(this.dsKeySrch);
+	
+	//1.필수입력 체크
+	if(this.lfn_CheckValidation(this.divHead)) {	
+		this.lfn_Transaction	(
+			"selectList"									//tranCallBack ID
+		,	"cc0006/selectList.nx"							//Service Name
+		,	"dsParams=dsKeySrch"							//Input Data
+		,	"dsTncmcc001=dsTncmcc001"						//Output Data
+		,	""												//Input Parameters
+		,	"fn_TranCallBack"								//tranCallBack Function Name
+		,	true											//ProgressBar Active Y/N
+			);
+	}
+};
+</code></pre>
+
+h1. 공통 콜백 함수 사용
+
+* fn_keySrchGridOnCellClick 를 정의 하면 map 형태로 정보를 받아서 추가 로직을 사용할 수 있습니다.
+* 함수가 호출 되는 시점은, 그리드의 데이터를 선택 하였을 때
+* map에 담겨져 오는 정보들
+** 그리드가 보여지고 있는 Edit 박스 객체. map의 key : obj
+** 그리드가 보여지고 있는 Edit 박스 객체의 ID . map의 key : objId
+** split 형태일 경우, 코드명이 적용될 Edit 박스 객체. map의 key : codeNameObj
+** split 형태일 경우, 코드명이 적용될 Edit 박스 객체의 ID . map의 key : codeNameObjId
+** 기타 정보. gdsXXX 로 시작하는 Dataset의 데이터를 넘겨줌. codeId 에 gds 를 앞에 붙이면 됨. Ex) gdsWstCd 는 폐기물
+
+<pre><code class="javascript">
+	if(codeId == "wstCd"){//폐기물
+		dsColList = ["wstCd","wstNm"];
+		grdColList = ["폐기물코드","폐기물명"];
+	}else if(codeId == "manfArCd"){//인계서관할지역
+		dsColList = ["manfArCd","manfArCdNm"];
+		grdColList = ["관할지역코드","관할지역명"];
+	}else if(codeId == "manfDbetCd"){//인계서배출처
+		dsColList = ["manfDbetCd","manfDbetCdNm"];
+		grdColList = ["배출처코드","배출처명"];
+	}else if(codeId == "manfWstCd"){//인계서폐기물
+		dsColList = ["manfWstCd","manfWstCdNm"];
+		grdColList = ["폐기물코드","폐기물명"];
+	}else if(codeId == "arCd"){//지역
+		dsColList = ["arCd","arNm"];
+		grdColList = ["지역코드","지역명"];
+	}else if(codeId == "dbetCd"){//배출업소
+		dsColList = ["dbetCd","dbetNm"];
+		grdColList = ["배출업소코드","배출업소명"];
+	}else if(codeId == "tcpyCd"){//운반업체
+		dsColList = ["tcpyCd","tcpyNm","arCd","arNm"];
+		grdColList = ["운반업체코드","운반업체명","지역코드","지역명"];
+	}else if(codeId == "postNo"){//주소
+		dsColList = ["postNo","adres"];
+		grdColList = ["우편번호","주소"];
+	}else if(codeId == "empList"){//적발자
+		dsColList = ["empId","empNm","cmnCdNm","cmnCdNmt"];
+		grdColList = ["직원ID","직원명","부서명","직급"];
+	}else if(codeId == "vhcList"){//차량번호
+		dsColList = ["vhcNo","tcpyCd","tcpyNm","arNm"];
+		grdColList = ["차량번호","운반업체코드","운반업체명","지역명"];
+	}
+</code></pre>
+
+* 공통 콜백 함수 사용 예시
+
+<pre><code class="javascript">
+
+this.fn_keySrchGridOnCellClick = function(map){
+	trace(map.objId);
+	if(map.codeNameObjId){ trace(map.codeNameObjId); }
+	if(typeof map == 'object'){
+		for(key in map){
+			trace("key >>>"+key+" value >>>"+map[key]);
+			if(key == "arCd"){ trace(map.arCd); }
+		}
+	}
+}
+</code></pre>
+
+
+h1. 주의사항
+
+* Edit 박스에 onkeyup 이벤트를 정의 하면 공통 로직이 동작을 안하고 정의한 함수로 빠지니 비워두세요
+* Dataset useclientlayout 프로퍼티가 false 이면 쿼리 조회 결과로 인해 Edit 박스와 바인딩된 정보가 동작하지 않을 수 있습니다. 
+  (컬럼정보가 쿼리 결과 정보로 overwrite 되기 때문. 그 외에도 다른 이슈가 있을수도..)
+* 검색영역 또는 탭에서 사용가능 (에러 없이 완벽 동작 보장 못함)
+
+h1. 코드, 코드명 정보를 두개의 다른 Edit 박스에 보여주는 하는 방법
+
+* 예시
+<pre><code class="javascript">
+this.lfn_setKeywordSearchEdit(this,this.Tab0.tab1.form.Div00_00.form.edtPostNo,"postNo",{
+			"displayType" : "split"
+			, "codeNameObjId" : "edtAdr1"
+		});//주소
+</code></pre>
+
+h1. 코드값만 Edit 박스에 보여주는 방법
+
+* 예시
+<pre><code class="javascript">
+this.lfn_setKeywordSearchEdit(this,this.Tab0.tab1.form.Div00_00.form.edtRepArCd,"arCd",{
+			"displayType" : "code"
+		});//지역
+</code></pre>
+
+h1. 그리드에서 선택시(엔터 포함), 선택된 정보를 콜백 함수(fn_keySrchGridOnCellClick <<= 함수명 고정)에 Map 형태로 받을수 있도록 추가
+
+* 위의 공통 콜백 함수 내용과 중복 되는 부분입니다.
+
+<pre><code class="javascript">
+this.fn_keySrchGridOnCellClick = function(map){
+	if(typeof map == 'object'){
+		for(key in map){
+			trace("key >>>"+key+" value >>>"+map[key]);
+		}
+	}
+}
+</code></pre>
+
+
+		
