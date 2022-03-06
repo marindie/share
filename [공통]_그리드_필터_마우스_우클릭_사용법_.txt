@@ -1,0 +1,17 @@
+h1. [공통] 그리드 필터 마우스 우클릭 사용법 
+
+* 각 화면 마다 그리드 필터를 적용할 그리드 대상에 User Properties 를 추가
+
+<pre><code class="javascript">
+this.form_OnLoadCompleted = function(obj:nexacro.Form, e:nexacro.LoadEventInfo)
+{		
+     this.fn_GridFilter();							//그리드 필터 세팅
+};
+
+this.fn_GridFilter = function(){
+	//그리드 필터에 사용될 그리드 별로 userGridName 을 적어준다.
+	//필터에서 노출될 그리드명을 뜻한다
+	this.grdList1.userGridName = "일별 인계서 배출처 협의 집계량";
+	this.lfn_SetGridFilter(this);					//[공통] 그리드 필터 세팅
+}
+</code></pre>

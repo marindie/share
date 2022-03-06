@@ -1,0 +1,21 @@
+h1. [공통] SLC 관련 함수 설명 
+
+* SLC.app()
+** nexacro.getApplication() 함수와 동일한 동작
+
+* SLC.newDs(form, colArr, dsId)
+** 파라미터로 Dataset 을 등록 할 Form 객체를 받기를 기대하며, 
+** 새로운 Dataset 을 만들어서 파라미터(form)로 넘어온 Form 객체에 Dataset을 등록해줌
+** colArr 에 ["aaa","bbb"] 와 같은 String Array 를 넘기면 해당 String 들로 Column 정보를 등록해줌.
+** dsId 는 Dataset ID 를 의미
+** 이미 같은 이름의 객체가 존재하면 기존 Dataset 을 삭제해 버리고 새로 만들어서 기존 컬럼 정보가 날라가니 사용에 주의
+
+* SLC.setSearchDs(form, map, dsId)
+** 파라미터로 Dataset 을 등록 할 Form 객체를 받기를 기대하며, 
+** 새로운 Dataset 을 만들어서 파라미터(form)로 넘어온 Form 객체에 Dataset을 등록해줌
+** map에 ["aaa" : "111 ,"bbb" : "222" ] 와 같은 Map 정보를 넘기면 해당 String 들로 Column 정보를 등록하고
+** 등록한 컬럼에 값을 "111" 와 같은 값들로 세팅해줌.
+** 새로 등록하여 만든 Dataset 이기에 내부적으로 새로운 Row 를 addRow() 함수를 통해서 만들어서 값을 세팅해줌.
+** dsId 는 Dataset ID 를 의미
+** 이미 같은 이름의 객체가 존재하면 기존 Dataset 을 삭제해 버리고 새로 만들어서 기존 컬럼 정보가 날라가니 사용에 주의
+

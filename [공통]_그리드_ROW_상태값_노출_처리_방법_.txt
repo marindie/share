@@ -1,0 +1,62 @@
+h1. [공통] 그리드 ROW 상태값 노출 처리 방법
+
+* 쿼리 XML 에서 STATE에 기본값 주기
+
+<pre><code class="sql">
+SELECT
+ 'N' STATE
+...
+</code></pre>
+
+* delete 이벤트 넣기
+
+<pre><code class="javascript">
+     var vDelNo = this.dsVlt.getRowType(this.dsVlt.rowposition);     
+     if(vDelNo == 2){
+          this.dsVlt.deleteRow(this.dsVlt.rowposition);
+     }else{
+          this.dsVlt.setColumn(this.dsVlt.rowposition, "delAt", 1);
+          this.dsVlt.setColumn(this.dsVlt.rowposition, "updusr", nexacro.getApplication().gdsUserInfo.getColumn(0, "empId") );
+          this.dsVlt.setColumn(this.dsVlt.rowposition, "state",   "D");
+     }
+</code></pre>
+
+* 데이터셋 이벤트 넣기 Ex.) dsTncmcc045_OnColumnChanged
+
+<pre><code class="javascript">
+     this.dsTncmcc045.setColumn(this.dsTncmcc045.rowposition, "updusr", nexacro.getApplication().gdsUserInfo.getColumn(0, "empId") );
+      
+     var vRowType = this.dsTncmcc045.getRowType(e.row);
+          
+     if(vRowType == '1'){
+          this.dsTncmcc045.setColumn(e.row,"imagecontrol","");
+     }else if(vRowType == '4'){//수정
+          var vStatus = this.dsTncmcc045.getColumn(e.row,"state");
+          if(vStatus == "D"){
+               this.dsTncmcc045.setColumn(e.row,"imagecontrol","theme://images/ico_grd_D.png");
+          }else{
+               this.dsTncmcc045.setColumn(e.row,"imagecontrol","theme://images/ico_grd_U.png");
+          }
+     }else if(vRowType == '2'){ 
+          this.dsTncmcc045.setColumn(e.row,"imagecontrol","theme://images/ico_grd_I.png");
+     }
+</code></pre>
+
+* callback 함수에 addColumn 추가.. 참고..
+
+<pre><code class="javascript">
+this.fn_TranCallBack = function(sTrId, ErrorCode, ErrorMsg){
+    case "SELECT" :               
+        if(this.dsTncmcc045.length == 0){
+            this.lfn_Alert("조회된 데이터가 없습니다.");
+            return;
+        }
+        this.staTotalCnt.set_text(this.lfn_getTotalCnt(this.dsTncmcc045));
+        this.dsTncmcc045_OnRowPosChanged(this.dsTncmcc045,null,0);
+        *this.dsTncmcc045.addColumn("imagecontrol", "string" );*
+        //fn_SetRowStyle();//각 행마다 색깔 변경하기
+        break;
+...
+}
+</code></pre>
+

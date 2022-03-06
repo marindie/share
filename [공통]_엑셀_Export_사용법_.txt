@@ -1,0 +1,26 @@
+h1. [공통] 엑셀 Export 사용법 
+
+* 저장 방식 (01/02)
+** 별도시트(01) : 각 Grid 의 데이터를 각각의 Sheet 에 생성
+** 통합시트(02) : 같은 이름으로 된 Sheet 명에 순차적으로 Grid 데이터를 추가해줌. 
+                  통합시트에서 Grid 데이터의 우선순위는 엑셀 다운로드 팝업에 뿌려지는 순서대로임.
+
+* User Property 를 사용하여 엑셀 Export 대상을 선정한다
+* userExcelFileName : 필수 값으로, 엑셀 파일명을 뜻함. 이 값이 없으면 엑셀 Export 대상으로 선택되지 않는다. 
+* userExcelSheetName : 엑셀 Sheet 명으로 필수값은 아니나, 빈값으로 두면 userExcelFileName 값으로 세팅됨.
+** 엑셀 Export Grid 수가 2개 이상이면, userExcelSheetName 을 채워주는 것을 추천.
+** 엑셀다운로드 팝업창에서 수정 가능
+* userExcelSaveTp : 저장방식을 뜻함. 01 별도시트, 02 통합시트, 기본값 01, 엑셀다운로드 팝업창에서 변경 가능
+
+<pre><code class="javascript">
+this.form_OnLoadCompleted = function(obj:nexacro.Form, e:nexacro.LoadEventInfo)
+{	
+     this.fn_SetExcelList();							//엑셀 다운로드 대상 세팅
+}
+
+this.fn_SetExcelList = function(){
+	this.grdList1.userExcelFileName = "일별 인계서 배출처 협의 집계량";
+	this.grdList1.userExcelSheetName = "배출처 협의 집계량";
+	this.grdList1.userExcelSaveTp = "01";
+}
+</code></pre>

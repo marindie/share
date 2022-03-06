@@ -1,0 +1,24 @@
+h1. [공통] 그리드 정렬 사용법 
+
+* 정렬 하고자 하는 그리드를 선별하여 사용한다.
+* onheadclick 을 이벤트 등록하여 내부적으로 정렬을 처리해줌
+* 추가적으로 각 화면별로 onheadclick 을 정의해서 사용해도 동작에 큰 문제는 없어보임.
+
+<pre><code class="javascript">
+this.form_OnLoadCompleted = function(obj:nexacro.Form, e:nexacro.LoadEventInfo)
+{	
+     this.fn_SetGridSort();							//그리드 정렬 세팅
+}
+
+this.fn_SetGridSort = function(){
+     this.lfn_SetGridSort(this.grdList1,this);
+}
+</code></pre>
+
+<pre><code class="javascript">
+this.grdList1_onheadclick = function(obj:nexacro.Grid,e:nexacro.GridClickEventInfo)
+{
+     trace('here');
+};
+</code></pre>
+
