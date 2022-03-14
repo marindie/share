@@ -45,6 +45,17 @@ sudo htpasswd -m /etc/apache2/dav_svn.passwd codenameyong
 sudo htpasswd -m /etc/apache2/dav_svn.passwd wony
 sudo htpasswd -m /etc/apache2/dav_svn.passwd wony
 
+사용자 추가는 잘 되었지만, 권한 이슈가 있어서, chmod 777로 세팅해서
+사용중이였다..
+
+아래의 옵션으로 권한 설정이 가능하다고함.
+절대 경로를 적어줘야함.
+AuthzSVNAccessFile /etc/apache2/svn-acl.txt
+
+== svn-acl.txt 파일 내용. 모든 repository에 read write 권한 부여
+[/]
+* = rw
+
 sudo systemctl restart apache2.service
 
 == apache port 설정
