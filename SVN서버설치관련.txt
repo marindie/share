@@ -23,6 +23,7 @@ sudo vi /etc/apache2/mods-enabled/dav_svn.conf
 	AuthType= Basic
 	AuthName= "Subversion Repository"
 	AuthUserFile /etc/apache2/dav_svn.passwd
+        AuthzSVNAccessFile /etc/apache2/svn-acl.txt
 	
 	<LimitExcept GET PROPFIND OPTIONS REPORT>
 		Require valid-user
